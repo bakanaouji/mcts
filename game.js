@@ -152,6 +152,12 @@ function shiftToNewGameTree(gameTree) {
     } 
     // ゲームが終了していなかったら打てる手を表示
     else {
-        setupUIToSelectMove(gameTree);
+        if (gameTree.player == BLACK) {
+            setupUIToSelectMove(gameTree);
+        } 
+        // AIの手番であればUIを表示せずに進める
+        else {
+            selectMoveByAI(gameTree);
+        }
     }
 }
