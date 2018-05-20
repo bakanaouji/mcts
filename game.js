@@ -9,7 +9,7 @@ function nextPlayer(player) {
  * 指定の位置に石を置くことができるかどうか
  */
 function canAttack(board, x, y, player) {
-    return vulnerableCellList(board, x, y, player).length;
+    return turnableCellList(board, x, y, player).length;
 }
 
 /**
@@ -68,12 +68,12 @@ function completePassingMove(moves, board, player, wasPassed) {
 /**
  * 指定の位置に石を置いたときにひっくりかえせる石のリストを取得
  */
-function vulnerableCellList(board, x, y, player) {
-    var vulnerableCells = [];
+function turnableCellList(board, x, y, player) {
+    var turnableCells = [];
 
     // すでに石が置いてあったら置くことはできないので、どこもひっくりかえせない
     if (board[[x, y]] != EMPTY) {
-        return vulnerableCells;
+        return turnableCells;
     }
 
     var opponent = nextPlayer(player);
@@ -96,7 +96,7 @@ function vulnerableCellList(board, x, y, player) {
                 var cell = board[[nx, ny]];
                 if (cell == player && 2 <= i) {
                     for (var j = 0; j < i; ++j) {
-                        vulnerableCells.push([x + j * dx, y + j * dy]);
+                        turnableCells.push([x + j * dx, y + j * dy]);
                     }
                     break;
                 } 
@@ -108,7 +108,7 @@ function vulnerableCellList(board, x, y, player) {
         }
     }
 
-    return vulnerableCells;
+    return turnableCells;
 }
 
 /**
@@ -117,9 +117,9 @@ function vulnerableCellList(board, x, y, player) {
 function makeNextBoard(board, x, y, player) {
     var newBoard = JSON.parse(JSON.stringify(board));
     // ひっくりかえせる石をすべてひっくりかえす
-    var vulnerableCells = vulnerableCellList(board, x, y, player);
-    for (var i = 0; i < vulnerableCells.length; ++i) {
-        newBoard[vulnerableCells[i]] = player;
+    var turnableCells = turnableCellList(board, x, y, player);
+    for (var i = 0; i < turnableCells.length; ++i) {
+        newBoard[turnableCells[i]] = player;
     }
     return newBoard;
 }
