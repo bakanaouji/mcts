@@ -12,7 +12,7 @@ function makeLavelForMove(move) {
 /**
  * 選択できる行動をボタンで表示
  */
-function setupUIToSelectAction(gameTree) {
+function setupUIToSelectMove(gameTree) {
     $('#message').text('Select your move.');
     gameTree.moves.forEach(function (m, i) {
         $('#console').append(

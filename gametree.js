@@ -5,6 +5,6 @@ function makeGameTree(board, player, wasPassed) {
     return {
         board: board,
         player: player,
-        moves: possibleActionList(board, player, wasPassed)
+        moves: possibleMoveList(board, player, wasPassed)
     };
 }

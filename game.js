@@ -15,14 +15,14 @@ function canAttack(board, x, y, player) {
 /**
  * 可能な行動のリストを取得
  */
-function possibleActionList(board, player, wasPassed) {
-    var possibleActions = [];
+function possibleMoveList(board, player, wasPassed) {
+    var possibleMoves = [];
 
     // 石を置くことができる行動を列挙していく
     for (var x = 0; x < N; ++x) {
         for (var y = 0; y < N; ++y) {
             if (canAttack(board, x, y, player)) {
-                possibleActions.push({
+                possibleMoves.push({
                     x: x,
                     y: y,
                     gameTreePromise: (function (x, y) {
@@ -41,7 +41,7 @@ function possibleActionList(board, player, wasPassed) {
 
     // 必要であればパスする手も加えて返す
     return completePassingMove(
-        possibleActions,
+        possibleMoves,
         board,
         player,
         wasPassed
@@ -152,6 +152,6 @@ function shiftToNewGameTree(gameTree) {
     } 
     // ゲームが終了していなかったら打てる手を表示
     else {
-        setupUIToSelectAction(gameTree);
+        setupUIToSelectMove(gameTree);
     }
 }
