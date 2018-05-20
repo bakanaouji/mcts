@@ -117,7 +117,7 @@ function makeNextBoard(board, x, y, player) {
     // ひっくりかえせる石をすべてひっくりかえす
     var vulnerableCells = vulnerableCellList(board, x, y, player);
     for (var i = 0; i < vulnerableCells.length; ++i) {
-        newBoard[vulnerableCells[j]] = player;
+        newBoard[vulnerableCells[i]] = player;
     }
     return newBoard;
 }
