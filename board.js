@@ -1,4 +1,4 @@
-var N = 5;  // TODO: 後で拡大する。
+var N = 4;  // TODO: 後で拡大する。
 
 var EMPTY = 'empty';
 var WHITE = 'white';
@@ -64,5 +64,3 @@ function drawGameBoard(board, player) {
   // 現在のプレイヤーを表示
   $('#current-player-name').text(player);
 }
-
-drawGameBoard(makeInitialGameBoard(), BLACK);

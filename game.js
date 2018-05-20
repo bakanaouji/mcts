@@ -2,7 +2,7 @@
  * 次の手番のプレイヤーを取得
  */
 function nextPlayer(player) {
-    reutrn (player == BLACK ? WHITE : BLACK);
+    return (player == BLACK ? WHITE : BLACK);
 }
 
 /**
@@ -85,7 +85,7 @@ function vulnerableCellList(board, x, y, player) {
             }
             // 上下左右斜め方向に自分の石が存在していたら、
             // その間にある石をひっくりかえせる
-            for (var i = 2; i < N; ++i) {
+            for (var i = 1; i < N; ++i) {
                 var nx = x + i * dx;
                 var ny = y + i * dy;
                 // 盤面からはみ出ていたらチェックできない
@@ -94,7 +94,7 @@ function vulnerableCellList(board, x, y, player) {
                 }
                 // 自分の石が存在していたら、その間にある石をひっくりかえせる石として追加
                 var cell = board[[nx, ny]];
-                if (cell == player) {
+                if (cell == player && 2 <= i) {
                     for (var j = 0; j < i; ++j) {
                         vulnerableCells.push([x + j * dx, y + j * dy]);
                     }
@@ -120,4 +120,25 @@ function makeNextBoard(board, x, y, player) {
         newBoard[vulnerableCells[i]] = player;
     }
     return newBoard;
+}
+
+/**
+ * ゲームをリセット
+ */
+function resetGame() {
+    shiftToNewGameTree(makeGameTree(makeInitialGameBoard(), BLACK, false));
+}
+
+/**
+ * 次の局面へ移動する
+ */
+function shiftToNewGameTree(gameTree) {
+    drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
+    resetUI();
+    if (gameTree.moves.length == 0) {
+        showWinner(gameTree.board);
+        setupUIToReset();
+    } else {
+        setupUIToSelectAction(gameTree);
+    }
 }
