@@ -19,7 +19,7 @@ function setupUIToSelectAction(gameTree) {
             $('<input type="button" class="btn">')
             .val(makeLavelForMove(m))
             .click(function() {
-                shiftToNewGameTree(m.gameTree);
+                shiftToNewGameTree(force(m.gameTreePromise));
             })
         );
     });

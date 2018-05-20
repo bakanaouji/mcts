@@ -25,11 +25,15 @@ function possibleActionList(board, player, wasPassed) {
                 possibleActions.push({
                     x: x,
                     y: y,
-                    gameTree: makeGameTree(
-                        makeNextBoard(board, x, y, player),
-                        nextPlayer(player),
-                        false
-                    )
+                    gameTreePromise: (function (x, y) {
+                        return delay(function () {
+                            return makeGameTree(
+                                makeNextBoard(board, x, y, player),
+                                nextPlayer(player),
+                                false
+                            );
+                        });
+                    })(x, y)
                 });
             }
         }
@@ -56,7 +60,9 @@ function completePassingMove(moves, board, player, wasPassed) {
     else if (!wasPassed) {
         return [{
             isPassingMove: true,
-            gameTree: makeGameTree(board, nextPlayer(player), true)
+            gameTreePromise: delay(function () {
+                return makeGameTree(board, nextPlayer(player), true);
+            })
         }];
     } 
     // 前に相手がパスしていたら、ゲーム終了
