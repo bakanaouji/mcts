@@ -9,7 +9,7 @@ function nextPlayer(player) {
  * 指定の位置に石を置くことができるかどうか
  */
 function canAttack(board, x, y, player) {
-    return (vulnerableCellList(board, x, y, player).length != 0);
+    return vulnerableCellList(board, x, y, player).length;
 }
 
 /**
@@ -99,7 +99,9 @@ function vulnerableCellList(board, x, y, player) {
                         vulnerableCells.push([x + j * dx, y + j * dy]);
                     }
                     break;
-                } else if (cell == EMPTY) {
+                } 
+                // 相手の石が存在していなかったら，チェックできない
+                if (cell != opponent) {
                     break;
                 }
             }
@@ -133,12 +135,17 @@ function resetGame() {
  * 次の局面へ移動する
  */
 function shiftToNewGameTree(gameTree) {
-    drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
+    // 盤面を描画する
+    drawGameBoard(gameTree.board, gameTree.player);
+    // UIを初期化
     resetUI();
+    // ゲームが終了していたら，勝者を表示
     if (gameTree.moves.length == 0) {
         showWinner(gameTree.board);
         setupUIToReset();
-    } else {
+    } 
+    // ゲームが終了していなかったら打てる手を表示
+    else {
         setupUIToSelectAction(gameTree);
     }
 }
