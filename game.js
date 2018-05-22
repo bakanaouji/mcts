@@ -152,7 +152,11 @@ function shiftToNewGameTree(gameTree) {
     } 
     // ゲームが終了していなかったら打てる手を表示
     else {
-        if (gameTree.player == BLACK) {
+        var playerTypeTable = {};
+        playerTypeTable[BLACK] = $('#black-player-type').val();
+        playerTypeTable[WHITE] = $('#white-player-type').val();
+        var playerType = playerTypeTable[gameTree.player];
+        if (playerType == 'human') {
             setupUIToSelectMove(gameTree);
         } 
         // AIの手番であればUIを表示せずに進める
