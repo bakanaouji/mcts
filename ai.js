@@ -17,14 +17,15 @@ function selectMoveByAI(gameTree) {
  * AIによる行動選択
  */
 function findBestMoveByAI(gameTree) {
-    var ratings = calculateMaxRatings(
-        limitGameTreeDepth(gameTree, 4),
-        gameTree.player,
-        Number.MIN_VALUE,
-        Number.MAX_VALUE
-    );
-    var maxRating = Math.max.apply(null, ratings);
-    return gameTree.moves[ratings.indexOf(maxRating)];
+    // var ratings = calculateMaxRatings(
+    //     limitGameTreeDepth(gameTree, 4),
+    //     gameTree.player,
+    //     Number.MIN_VALUE,
+    //     Number.MAX_VALUE
+    // );
+    // var maxRating = Math.max.apply(null, ratings);
+    // return gameTree.moves[ratings.indexOf(maxRating)];
+    return tryPrimitiveMonteCarloSimulation(gameTree, 100);
 }
 
 /**
@@ -95,18 +96,69 @@ function calculateMinRatings(gameTree, player, lowerLimit, upperLimit) {
     for (var i = 0; i < gameTree.moves.length; i++) {
         // 手の価値を計算
         var r = ratePositionWithAlphaBetaPruning(
-        force(gameTree.moves[i].gameTreePromise),
-        player,
-        upperLimit,
-        newUpperLimit
-      );
-      ratings.push(r);
+            force(gameTree.moves[i].gameTreePromise),
+            player,
+            upperLimit,
+            newUpperLimit
+        );
+        ratings.push(r);
         // 手の価値が下限以下だと判明した場合，
         // 現在の局面から辿れる範囲に上層が求める最善手の候補は存在しないので，
         // 残りの手の価値を求める意味がないので列挙を中断
-      if (r <= lowerLimit)
-        break;
-      newUpperLimit = Math.min(r, newUpperLimit);
+        if (r <= lowerLimit) {
+            break;
+        }
+        newUpperLimit = Math.min(r, newUpperLimit);
     }
     return ratings;
-  }
+}
+
+/**
+ * 原始モンテカルロ木探索で手を決定
+ */
+function tryPrimitiveMonteCarloSimulation(rootGameTree, maxTries) {
+    var scores = rootGameTree.moves.map(function (m) {
+        var s = 0;
+        for (var i = 0; i < maxTries; ++i) {
+            s += simulateRandomGame(m, rootGameTree.player);
+        }
+        return s;
+    });
+    var maxScore = Math.max.apply(null, scores);
+    return rootGameTree.moves[scores.indexOf(maxScore)];
+}
+
+/**
+ * 指定の手を打った後に，ゲーム終了までランダムに手を決定して進める
+ */
+function simulateRandomGame(move, player) {
+    var gameTree = force(move.gameTreePromise);
+    while (gameTree.moves.length !== 0) {
+        gameTree = force(gameTree.moves[getRandomInt(gameTree.moves.length)].gameTreePromise);
+    }
+    return judge(gameTree.board) * (player == BLACK ? 1: -1);
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
+/**
+ * 白黒どちらが勝ったかを判定
+ */
+function judge(board) {
+    var n = {};
+    n[BLACK] = 0;
+    n[WHITE] = 0;
+    n[EMPTY] = 0;
+    for (var i = 0; i < board.length; ++i) {
+        ++n[board[i]];
+    }
+    if (n[BLACK] > n[WHITE]) {
+        return 1;
+    }
+    if (n[BLACK] < n[WHITE]) {
+        return -1;
+    }
+    return 0;
+}
