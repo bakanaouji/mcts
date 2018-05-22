@@ -25,7 +25,8 @@ function findBestMoveByAI(gameTree) {
     // );
     // var maxRating = Math.max.apply(null, ratings);
     // return gameTree.moves[ratings.indexOf(maxRating)];
-    return tryPrimitiveMonteCarloSimulation(gameTree, 100);
+    // return tryPrimitiveMonteCarloSimulation(gameTree, 100);
+    return tryMonteCarloTreeSearch(gameTree, 2048);
 }
 
 /**
@@ -134,13 +135,13 @@ function tryPrimitiveMonteCarloSimulation(rootGameTree, maxTries) {
 function simulateRandomGame(move, player) {
     var gameTree = force(move.gameTreePromise);
     while (gameTree.moves.length !== 0) {
-        gameTree = force(gameTree.moves[getRandomInt(gameTree.moves.length)].gameTreePromise);
+        gameTree = force(gameTree.moves[random(gameTree.moves.length)].gameTreePromise);
     }
     return judge(gameTree.board) * (player == BLACK ? 1: -1);
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
+function random(n) {
+    return Math.floor(Math.random() * n);
 }
 
 /**
@@ -151,8 +152,10 @@ function judge(board) {
     n[BLACK] = 0;
     n[WHITE] = 0;
     n[EMPTY] = 0;
-    for (var i = 0; i < board.length; ++i) {
-        ++n[board[i]];
+    for (var x = 0; x < N; x++) {
+        for (var y = 0; y < N; y++) {
+            ++n[board[[x, y]]];
+        }
     }
     if (n[BLACK] > n[WHITE]) {
         return 1;
