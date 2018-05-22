@@ -1,4 +1,4 @@
-var N = 4;  // TODO: 後で拡大する。
+var N = 8;
 
 var EMPTY = 'empty';
 var WHITE = 'white';
