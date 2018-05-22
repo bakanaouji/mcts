@@ -1,1 +1,1 @@
-resetGame();
+setupUIToReset();
