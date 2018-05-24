@@ -135,14 +135,6 @@
     }
   }
 
-  function blackPlayerType() {
-    return $('#black-player-type').val();
-  }
-
-  function whitePlayerType() {
-    return $('#white-player-type').val();
-  }
-
   function shiftToNewGameTree(gameTree) {
     drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
     resetUI();
@@ -164,8 +156,10 @@
     $('#preference-pane :input')
       .addClass('disabled')
       .attr('disabled', 'disabled');
-    playerTable[O.BLACK] = makePlayer(blackPlayerType());
-    playerTable[O.WHITE] = makePlayer(whitePlayerType());
+    playerTable[O.BLACK] = makePlayer($('#black-player-type').val());
+
+    playerTable[O.WHITE] = makePlayer($('#white-player-type').val());
+
     shiftToNewGameTree(O.makeInitialGameTree());
   }
 
