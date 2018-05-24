@@ -177,7 +177,6 @@
   // Startup {{{1
 
   $('#start-button').click(function () { startNewGame(); });
-  $('#add-new-ai-button').click(function () { O.addNewAI(); });
   setUpUIToReset();
   drawGameBoard(O.makeInitialGameBoard(), '-', []);
 

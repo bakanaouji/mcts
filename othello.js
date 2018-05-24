@@ -263,18 +263,14 @@ var othello = {};
   };
 
   function makeAI(playerType) {
-    if (playerType in externalAITable) {
-      return externalAITable[playerType];
-    } else {
-      var tokens = playerType.split('-');
-      var aiType = tokens[0];
-      var level = parseInt(tokens[1]);
-      var extras = tokens.slice(2);
-      return aiMakers[aiType]({
-        level: level,
-        extras: extras
-      });
-    }
+    var tokens = playerType.split('-');
+    var aiType = tokens[0];
+    var level = parseInt(tokens[1]);
+    var extras = tokens.slice(2);
+    return aiMakers[aiType]({
+      level: level,
+      extras: extras
+    });
   }
 
 
@@ -419,44 +415,6 @@ var othello = {};
 
 
 
-  // API {{{1
-
-  var externalAITable = {};
-
-  var lastAIType;
-
-  function registerAI(ai) {
-    externalAITable[lastAIType] = ai;
-  }
-
-
-  function addNewAI() {
-    var aiUrl = $('#new-ai-url').val();
-    var originalLabel = $('#add-new-ai-button').text();
-    if (externalAITable[aiUrl] === undefined) {
-      lastAIType = aiUrl;
-      $('#add-new-ai-button').text('Loading...').prop('disabled', true);
-      $.getScript(aiUrl, function () {
-        $('#black-player-type, #white-player-type').append(
-          '<option value="' + aiUrl + '">' + aiUrl + '</option>'
-        );
-        $('#white-player-type').val(aiUrl).change();
-        $('#add-new-ai-button').text(originalLabel).removeProp('disabled');
-      });
-    } else {
-      $('#add-new-ai-button').text('Already loaded').prop('disabled', true);
-      setTimeout(
-        function () {
-          $('#add-new-ai-button').text(originalLabel).removeProp('disabled');
-        },
-        1000
-      );
-    }
-  }
-
-
-
-
   // Public API {{{1
 
   othello.force = force;
@@ -465,12 +423,10 @@ var othello = {};
   othello.WHITE = WHITE;
   othello.BLACK = BLACK;
   othello.nextPlayer = nextPlayer;
-  othello.registerAI = registerAI;
   othello.N = N;
   othello.ix = ix;
   othello.makeInitialGameBoard = makeInitialGameBoard;
   othello.judge = judge;
-  othello.addNewAI = addNewAI;
   othello.makeAI = makeAI;
   othello.makeInitialGameTree = makeInitialGameTree;
   othello.nameMove = nameMove;
