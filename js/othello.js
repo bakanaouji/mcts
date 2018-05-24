@@ -192,16 +192,6 @@ function judge(board) {
   return 0;
 }
 
-/**
- * ボタンのラベルを決定
- */
-function makeLabelForMove(move) {
-  if (move.isPassingMove)
-    return 'Pass';
-  else
-    return 'abcdefgh'[move.x] + '12345678'[move.y];
-}
-
 
 
 
