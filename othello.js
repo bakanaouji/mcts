@@ -83,31 +83,30 @@ var othello = {};
   /**
    * ある盤面からのゲーム木を作成
    */
-  function makeGameTree(board, player, wasPassed, nest) {
+  function makeGameTree(board, player, wasPassed) {
     return {
       board: board,
       player: player,
-      moves: listPossibleMoves(board, player, wasPassed, nest)
+      moves: listPossibleMoves(board, player, wasPassed)
     };
   }
 
   /**
    * 可能な行動のリストを取得
    */
-  function listPossibleMoves(board, player, wasPassed, nest) {
+  function listPossibleMoves(board, player, wasPassed) {
     return completePassingMove(
-      listAttackingMoves(board, player, nest),
+      listAttackingMoves(board, player),
       board,
       player,
-      wasPassed,
-      nest
+      wasPassed
     );
   }
 
   /**
    * 必要であればパスする手を補完して取りうる行動を返す
    */
-  function completePassingMove(attackingMoves, board, player, wasPassed, nest) {
+  function completePassingMove(attackingMoves, board, player, wasPassed) {
     // どこかしらに石を置けるならそのまま返す
     if (0 < attackingMoves.length) {
       return attackingMoves;
@@ -117,7 +116,7 @@ var othello = {};
       return [{
         isPassingMove: true,
         gameTreePromise: delay(function () {
-          return makeGameTree(board, nextPlayer(player), true, nest + 1);
+          return makeGameTree(board, nextPlayer(player), true);
         })
       }];
     }
@@ -130,7 +129,7 @@ var othello = {};
   /**
    * 可能な行動のリストを取得
    */
-  function listAttackingMoves(board, player, nest) {
+  function listAttackingMoves(board, player) {
     var moves = [];
 
     // 石を置くことができる行動を列挙していく
@@ -146,8 +145,7 @@ var othello = {};
                 return makeGameTree(
                   makeAttackedBoard(board, x, y, vulnerableCells, player),
                   nextPlayer(player),
-                  false,
-                  nest + 1
+                  false
                 );
               });
             })(x, y, vulnerableCells)
