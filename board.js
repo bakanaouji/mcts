@@ -36,7 +36,7 @@ function drawGameBoard(board, player, moves) {
   var attackable = [];
   moves.forEach(function (m) {
     if (!m.isPassingMove) {
-      attackable[m.x + m.y * N] = true;
+      attackable[ix(m.x, m.y)] = true;
     }
   });
 
