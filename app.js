@@ -157,13 +157,13 @@
   }
 
   function resetGame() {
-    $('#preference-pane :input:not(#repeat-games)')
+    $('#preference-pane :input')
       .removeClass('disabled')
       .removeAttr('disabled');
   }
 
   function startNewGame() {
-    $('#preference-pane :input:not(#repeat-games)')
+    $('#preference-pane :input')
       .addClass('disabled')
       .attr('disabled', 'disabled');
     playerTable[O.BLACK] = makePlayer(blackPlayerType());
