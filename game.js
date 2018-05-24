@@ -142,7 +142,7 @@ function resetGame() {
  */
 function shiftToNewGameTree(gameTree) {
     // 盤面を描画する
-    drawGameBoard(gameTree.board, gameTree.player);
+    drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
     // UIを初期化
     resetUI();
     // ゲームが終了していたら，勝者を表示
