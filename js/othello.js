@@ -79,8 +79,9 @@ function makeNextBoard(board, x, y, turnableCells, player) {
   var newBoard = board.slice();
   newBoard[ix(x, y)] = player;
   // ひっくり返せる石をすべてひっくり返す
-  for (var i = 0; i < turnableCells.length; i++)
+  for (var i = 0; i < turnableCells.length; i++) {
     newBoard[turnableCells[i]] = player;
+  }
   return newBoard;
 }
 
@@ -91,33 +92,38 @@ function turnableCellList(board, x, y, player) {
   var turnableCells = [];
 
   // すでに石が置いてあったら置くことはできないので，どこもひっくり返せない
-  if (board[ix(x, y)] !== EMPTY)
+  if (board[ix(x, y)] !== EMPTY) {
     return turnableCells;
+  }
 
   var opponent = nextPlayer(player);
   for (var dx = -1; dx <= 1; dx++) {
     for (var dy = -1; dy <= 1; dy++) {
       // 石を置く位置はチェックする必要なし
-      if (dx === 0 && dy === 0)
+      if (dx === 0 && dy === 0) {
         continue;
+      }
       // 上下左右斜め方向に自分の石が存在していたら，
       // その間にある石をひっくり返せる
       for (var i = 1; i < N; i++) {
         var nx = x + i * dx;
         var ny = y + i * dy;
         // 盤面からはみ出ていたらチェックできない
-        if (nx < 0 || N <= nx || ny < 0 || N <= ny)
+        if (nx < 0 || N <= nx || ny < 0 || N <= ny) {
           break;
+        }
         // 自分の石が存在していたら，その間にある石をひっくり返せる石として追加
         var cell = board[ix(nx, ny)];
         if (cell === player && 2 <= i) {
-          for (var j = 1; j < i; j++)
+          for (var j = 1; j < i; j++) {
             turnableCells.push(ix(x + j * dx, y + j * dy));
+          }
           break;
         }
         // 相手の石が存在していなかったら，チェックできない
-        if (cell !== opponent)
+        if (cell !== opponent) {
           break;
+        }
       }
     }
   }
@@ -133,12 +139,15 @@ function judge(board) {
   n[BLACK] = 0;
   n[WHITE] = 0;
   n[EMPTY] = 0;
-  for (var i = 0; i < board.length; i++)
+  for (var i = 0; i < board.length; i++) {
     n[board[i]]++;
+  }
 
-  if (n[BLACK] > n[WHITE])
+  if (n[BLACK] > n[WHITE]) {
     return 1;
-  if (n[BLACK] < n[WHITE])
+  }
+  if (n[BLACK] < n[WHITE]) {
     return -1;
+  }
   return 0;
 }

@@ -2,10 +2,12 @@
  * ボタンのラベルを決定
  */
 function makeLabelForMove(move) {
-  if (move.isPassingMove)
+  if (move.isPassingMove) {
     return 'Pass';
-  else
+  }
+  else {
     return 'abcdefgh'[move.x] + '12345678'[move.y];
+  }
 }
 
 /**

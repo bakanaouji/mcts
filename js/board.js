@@ -12,9 +12,11 @@ function makeInitialGameBoard() {
   var board = [];
 
   // 盤面をすべてemptyに初期化
-  for (var x = 0; x < N; x++)
-    for (var y = 0; y < N; y++)
+  for (var x = 0; x < N; x++) {
+    for (var y = 0; y < N; y++) {
       board[ix(x, y)] = EMPTY;
+    }
+  }
 
   // 中心の4マスにwhiteとblackを配置
   var x2 = N >> 1;
@@ -35,8 +37,9 @@ function drawGameBoard(board, player, moves) {
   var htmlStyleFromBoard = [];
   var attackable = [];
   moves.forEach(function (m) {
-    if (!m.isPassingMove)
+    if (!m.isPassingMove) {
       attackable[ix(m.x, m.y)] = true;
+    }
   });
 
   // tableタグを使って表現

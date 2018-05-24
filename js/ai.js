@@ -56,11 +56,13 @@ function tryMonteCarloTreeSearch(rootGameTree, maxTries) {
   for (var i = 0; i < maxTries; i++) {
     var node = root;
 
-    while (node.untriedMoves.length === 0 && node.childNodes.length !== 0)
+    while (node.untriedMoves.length === 0 && node.childNodes.length !== 0) {
       node = node.selectChild();
+    }
 
-    if (node.untriedMoves.length !== 0)
+    if (node.untriedMoves.length !== 0) {
       node = node.expandChild();
+    }
 
     var won = node.simulate(rootGameTree.player);
 
@@ -108,8 +110,9 @@ Node.prototype.simulate = function (player) {
 };
 
 Node.prototype.backpropagate = function (result) {
-  for (var node = this; node !== null; node = node.parentNode)
+  for (var node = this; node !== null; node = node.parentNode) {
     node.update(result);
+  }
 };
 
 Node.prototype.update = function (won) {
@@ -122,15 +125,17 @@ Node.prototype.visualize = function (indent) {
   var ss = [];
   var i;
   ss.push('\n');
-  for (i = 0; i < indent; i++)
+  for (i = 0; i < indent; i++) {
     ss.push('| ');
+  }
   ss.push('W='); ss.push(this.wins);
   ss.push('/');
   ss.push('V='); ss.push(this.visits);
   ss.push('/');
   ss.push('U='); ss.push(this.untriedMoves.length);
-  for (i = 0; i < this.childNodes.length; i++)
+  for (i = 0; i < this.childNodes.length; i++) {
     ss.push(this.childNodes[i].visualize(indent + 1));
+  }
   return ss.join('');
 };
 
@@ -161,8 +166,9 @@ function tryPrimitiveMonteCarloSimulation(rootGameTree, maxTries, iterStyle) {
         ? maxTries
         : Math.floor(maxTries / moveCount)
         + (m === lastMove ? maxTries % moveCount : 0);
-    for (var i = 0; i < eachTries; i++)
+    for (var i = 0; i < eachTries; i++) {
       s += simulateRandomGame(m, rootGameTree.player);
+    }
     return s;
   });
   var maxScore = Math.max.apply(null, scores);
@@ -171,7 +177,8 @@ function tryPrimitiveMonteCarloSimulation(rootGameTree, maxTries, iterStyle) {
 
 function simulateRandomGame(move, player) {
   var gt = force(move.gameTreePromise);
-  while (gt.moves.length !== 0)
+  while (gt.moves.length !== 0) {
     gt = force(gt.moves[random(gt.moves.length)].gameTreePromise);
+  }
   return judge(gt.board) * (player === BLACK ? 1 : -1);
 }
