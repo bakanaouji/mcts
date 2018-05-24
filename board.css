@@ -23,6 +23,14 @@
   margin: 0;
   line-height: 0;
 }
+#game-board > table .cell.attackable
+{
+  cursor: pointer;
+}
+#game-board > table .cell.attackable:hover
+{
+  background: #cc0;
+}
 #game-board > table .cell > .disc
 {
   display: inline-block;
@@ -38,4 +46,12 @@
 #game-board > table .cell.black > .disc
 {
   background: #000;
+}
+#game-board > table .cell.attackable > .disc
+{
+  opacity: 0.2;
+}
+#game-board > table .cell.attackable:hover > .disc
+{
+  opacity: 1.0;
 }
