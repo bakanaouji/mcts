@@ -242,7 +242,7 @@ var othello = {};
   /**
    * ボタンのラベルを決定
    */
-  function nameMove(move) {
+  function makeLabelForMove(move) {
     if (move.isPassingMove)
       return 'Pass';
     else
@@ -426,7 +426,7 @@ var othello = {};
   othello.judge = judge;
   othello.makeAI = makeAI;
   othello.makeInitialGameTree = makeInitialGameTree;
-  othello.nameMove = nameMove;
+  othello.makeLabelForMove = makeLabelForMove;
 
 
 
