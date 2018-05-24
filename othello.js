@@ -103,20 +103,20 @@ var othello = {};
     // 石を置くことができる行動を列挙していく
     for (var y = 0; y < N; y++) {
       for (var x = 0; x < N; x++) {
-        var vulnerableCells = listVulnerableCells(board, x, y, player);
-        if (canAttack(vulnerableCells)) {
+        var turnableCells = turnableCellList(board, x, y, player);
+        if (canAttack(turnableCells)) {
           moves.push({
             x: x,
             y: y,
-            gameTreePromise: (function (x, y, vulnerableCells) {
+            gameTreePromise: (function (x, y, turnableCells) {
               return delay(function () {
                 return makeGameTree(
-                  makeAttackedBoard(board, x, y, vulnerableCells, player),
+                  makeNextBoard(board, x, y, turnableCells, player),
                   nextPlayer(player),
                   false
                 );
               });
-            })(x, y, vulnerableCells)
+            })(x, y, turnableCells)
           });
         }
       }
@@ -164,31 +164,31 @@ var othello = {};
   /**
    * 指定の位置に石を置くことができるかどうか
    */
-  function canAttack(vulnerableCells) {
-    return vulnerableCells.length;
+  function canAttack(turnableCells) {
+    return turnableCells.length;
   }
 
   /**
    * 指定の位置に石を置き，更新後の盤面を取得する
    */
-  function makeAttackedBoard(board, x, y, vulnerableCells, player) {
+  function makeNextBoard(board, x, y, turnableCells, player) {
     var newBoard = board.slice();
     newBoard[ix(x, y)] = player;
     // ひっくり返せる石をすべてひっくり返す
-    for (var i = 0; i < vulnerableCells.length; i++)
-      newBoard[vulnerableCells[i]] = player;
+    for (var i = 0; i < turnableCells.length; i++)
+      newBoard[turnableCells[i]] = player;
     return newBoard;
   }
 
   /**
    * 指定の位置に石を置いた時にひっくり返せる石のリストを取得
    */
-  function listVulnerableCells(board, x, y, player) {
-    var vulnerableCells = [];
+  function turnableCellList(board, x, y, player) {
+    var turnableCells = [];
 
     // すでに石が置いてあったら置くことはできないので，どこもひっくり返せない
     if (board[ix(x, y)] !== EMPTY)
-      return vulnerableCells;
+      return turnableCells;
 
     var opponent = nextPlayer(player);
     for (var dx = -1; dx <= 1; dx++) {
@@ -208,7 +208,7 @@ var othello = {};
           var cell = board[ix(nx, ny)];
           if (cell === player && 2 <= i) {
             for (var j = 1; j < i; j++)
-              vulnerableCells.push(ix(x + j * dx, y + j * dy));
+              turnableCells.push(ix(x + j * dx, y + j * dy));
             break;
           }
           // 相手の石が存在していなかったら，チェックできない
@@ -218,7 +218,7 @@ var othello = {};
       }
     }
 
-    return vulnerableCells;
+    return turnableCells;
   }
 
   /**
