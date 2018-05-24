@@ -85,7 +85,9 @@
    * 新しくゲームを始めるためのボタンを表示
    */
   function setUpUIToReset() {
-    resetGame();
+    $('#preference-pane :input')
+      .removeClass('disabled')
+      .removeAttr('disabled');
   }
 
   /**
@@ -135,23 +137,28 @@
     }
   }
 
+  /**
+   * 次の局面へ移動する
+   */
   function shiftToNewGameTree(gameTree) {
+    // 盤面を描画する
     drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
+    // UIを初期化
     resetUI();
+    // ゲームが終了していたら，勝者を表示
     if (gameTree.moves.length === 0) {
       showWinner(gameTree.board);
       setUpUIToReset();
-    } else {
+    } 
+    // ゲームが終了していなかったら次の手の選択に移る
+    else {
       playerTable[gameTree.player](gameTree);
     }
   }
 
-  function resetGame() {
-    $('#preference-pane :input')
-      .removeClass('disabled')
-      .removeAttr('disabled');
-  }
-
+  /**
+   * ゲームを開始
+   */
   function startNewGame() {
     $('#preference-pane :input')
       .addClass('disabled')
@@ -170,7 +177,7 @@
 
   $('#start-button').click(function () {startNewGame();});
   $('#add-new-ai-button').click(function () {O.addNewAI();});
-  resetGame();
+  setUpUIToReset();
   drawGameBoard(O.makeInitialGameBoard(), '-', []);
 
 
