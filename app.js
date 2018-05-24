@@ -33,7 +33,7 @@
           htmlStyleFromBoard.push('<span class="disc"></span>');
           htmlStyleFromBoard.push('</td>');
         } else if (0 <= x && y === -1) {
-          htmlStyleFromBoard.push('<th>' + String.fromCharCode('a'.charCodeAt(0)+x) + '</th>');
+          htmlStyleFromBoard.push('<th>' + String.fromCharCode('a'.charCodeAt(0) + x) + '</th>');
         } else if (x === -1 && 0 <= y) {
           htmlStyleFromBoard.push('<th>' + (y + 1) + '</th>');
         } else /* if (x === -1 && y === -1) */ {
@@ -67,16 +67,16 @@
       if (m.isPassingMove) {
         $('#console').append(
           $('<input type="button" class="btn">')
-          .val(O.nameMove(m))
-          .click(function () {
-            shiftToNewGameTree(O.force(m.gameTreePromise));
-          })
+            .val(O.nameMove(m))
+            .click(function () {
+              shiftToNewGameTree(O.force(m.gameTreePromise));
+            })
         );
       } else {
         $('#cell_' + m.x + '_' + m.y)
-        .click(function () {
-          shiftToNewGameTree(O.force(m.gameTreePromise));
-        });
+          .click(function () {
+            shiftToNewGameTree(O.force(m.gameTreePromise));
+          });
       }
     });
   }
@@ -119,8 +119,8 @@
     var r = O.judge(board);
     $('#message').text(
       r === 0 ?
-      'The game ends in a draw.' :
-      'The winner is ' + (r === 1 ? O.BLACK : O.WHITE) + '.'
+        'The game ends in a draw.' :
+        'The winner is ' + (r === 1 ? O.BLACK : O.WHITE) + '.'
     );
   }
 
@@ -149,7 +149,7 @@
     if (gameTree.moves.length === 0) {
       showWinner(gameTree.board);
       setUpUIToReset();
-    } 
+    }
     // ゲームが終了していなかったら次の手の選択に移る
     else {
       playerTable[gameTree.player](gameTree);
@@ -175,8 +175,8 @@
 
   // Startup {{{1
 
-  $('#start-button').click(function () {startNewGame();});
-  $('#add-new-ai-button').click(function () {O.addNewAI();});
+  $('#start-button').click(function () { startNewGame(); });
+  $('#add-new-ai-button').click(function () { O.addNewAI(); });
   setUpUIToReset();
   drawGameBoard(O.makeInitialGameBoard(), '-', []);
 

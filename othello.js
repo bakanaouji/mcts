@@ -5,6 +5,9 @@ var othello = {};
 
   // Utilities {{{1
 
+  /**
+   * 遅延評価
+   */
   function delay(expressionAsFunction) {
     var result;
     var isEvaluated = false;
@@ -22,6 +25,9 @@ var othello = {};
     return promise();
   }
 
+  /**
+   * 整数の乱数を生成
+   */
   function random(n) {
     return Math.floor(Math.random() * n);
   }
@@ -31,24 +37,32 @@ var othello = {};
 
   // Core logic {{{1
 
-  var m = location.href.match(/\?n=(\d+)$/);
-  var N = m === null ? 8 : parseInt(m[1]);
+  var N = 8;
 
   var EMPTY = 'empty';
   var WHITE = 'white';
   var BLACK = 'black';
 
+  /**
+   * グリッド座標をインデックスへ変換
+   */
   function ix(x, y) {
     return x + y * N;
   }
 
+  /**
+   * 盤面を初期化する
+   */
   function makeInitialGameBoard() {
+    // 盤面情報（empty，white，black）
     var board = [];
 
+    // 盤面をすべてemptyに初期化
     for (var x = 0; x < N; x++)
       for (var y = 0; y < N; y++)
         board[ix(x, y)] = EMPTY;
 
+    // 中心の4マスにwhiteとblackを配置
     var x2 = N >> 1;
     var y2 = N >> 1;
     board[ix(x2 - 1, y2 - 1)] = WHITE;
@@ -59,10 +73,16 @@ var othello = {};
     return board;
   }
 
+  /**
+   * 初期のゲーム木を作成
+   */
   function makeInitialGameTree() {
     return makeGameTree(makeInitialGameBoard(), BLACK, false, 1);
   }
 
+  /**
+   * ある盤面からのゲーム木を作成
+   */
   function makeGameTree(board, player, wasPassed, nest) {
     return {
       board: board,
@@ -71,6 +91,9 @@ var othello = {};
     };
   }
 
+  /**
+   * 可能な行動のリストを取得
+   */
   function listPossibleMoves(board, player, wasPassed, nest) {
     return completePassingMove(
       listAttackingMoves(board, player, nest),
@@ -81,18 +104,27 @@ var othello = {};
     );
   }
 
+  /**
+   * 必要であればパスする手を補完して取りうる行動を返す
+   */
   function completePassingMove(attackingMoves, board, player, wasPassed, nest) {
-    if (0 < attackingMoves.length)
+    // どこかしらに石を置けるならそのまま返す
+    if (0 < attackingMoves.length) {
       return attackingMoves;
-    else if (!wasPassed)
+    }
+    // 前に相手がパスしてなかったら，パスできる
+    else if (!wasPassed) {
       return [{
         isPassingMove: true,
         gameTreePromise: delay(function () {
           return makeGameTree(board, nextPlayer(player), true, nest + 1);
         })
       }];
-    else
+    }
+    // 前に相手がパスしていたら，ゲーム終了
+    else {
       return [];
+    }
   }
 
   function listAttackingMovesN(board, player, nest) {
@@ -143,46 +175,66 @@ var othello = {};
     });
   }
 
-  var listAttackingMoves = N === 8 ? listAttackingMoves8 : listAttackingMovesN;
+  var listAttackingMoves = listAttackingMoves8;
 
+  /**
+   * 次の手番のプレイヤーを取得
+   */
   function nextPlayer(player) {
     return player === BLACK ? WHITE : BLACK;
   }
 
+  /**
+   * 指定の位置に石を置くことができるかどうか
+   */
   function canAttack(vulnerableCells) {
     return vulnerableCells.length;
   }
 
+  /**
+   * 指定の位置に石を置き，更新後の盤面を取得する
+   */
   function makeAttackedBoard(board, x, y, vulnerableCells, player) {
     var newBoard = board.slice();
     newBoard[ix(x, y)] = player;
+    // ひっくり返せる石をすべてひっくり返す
     for (var i = 0; i < vulnerableCells.length; i++)
       newBoard[vulnerableCells[i]] = player;
     return newBoard;
   }
 
+  /**
+   * 指定の位置に石を置いた時にひっくり返せる石のリストを取得
+   */
   function listVulnerableCells(board, x, y, player) {
     var vulnerableCells = [];
 
+    // すでに石が置いてあったら置くことはできないので，どこもひっくり返せない
     if (board[ix(x, y)] !== EMPTY)
       return vulnerableCells;
 
     var opponent = nextPlayer(player);
     for (var dx = -1; dx <= 1; dx++) {
       for (var dy = -1; dy <= 1; dy++) {
+        // 石を置く位置はチェックする必要なし
         if (dx === 0 && dy === 0)
           continue;
+        // 上下左右斜め方向に自分の石が存在していたら，
+        // その間にある石をひっくり返せる
         for (var i = 1; i < N; i++) {
           var nx = x + i * dx;
           var ny = y + i * dy;
+          // 盤面からはみ出ていたらチェックできない
           if (nx < 0 || N <= nx || ny < 0 || N <= ny)
             break;
+          // 自分の石が存在していたら，その間にある石をひっくり返せる石として追加
           var cell = board[ix(nx, ny)];
           if (cell === player && 2 <= i) {
             for (var j = 1; j < i; j++)
               vulnerableCells.push(ix(x + j * dx, y + j * dy));
             break;
           }
+          // 相手の石が存在していなかったら，チェックできない
           if (cell !== opponent)
             break;
         }
@@ -192,6 +244,9 @@ var othello = {};
     return vulnerableCells;
   }
 
+  /**
+   * 白黒どちらが勝ったかを判定
+   */
   function judge(board) {
     var n = {};
     n[BLACK] = 0;
@@ -207,6 +262,9 @@ var othello = {};
     return 0;
   }
 
+  /**
+   * ボタンのラベルを決定
+   */
   function nameMove(move) {
     if (move.isPassingMove)
       return 'Pass';
@@ -300,12 +358,12 @@ var othello = {};
       for (var x = 0; x < N; x++) {
         if (y < N2) {
           var i = ix(x, y);
-          bu |= (board[i] === BLACK ? 1 : 0) << (n-x) << ((nu-y) * N);
-          wu |= (board[i] === WHITE ? 1 : 0) << (n-x) << ((nu-y) * N);
+          bu |= (board[i] === BLACK ? 1 : 0) << (n - x) << ((nu - y) * N);
+          wu |= (board[i] === WHITE ? 1 : 0) << (n - x) << ((nu - y) * N);
         } else {
           var j = ix(x, y);
-          bl |= (board[j] === BLACK ? 1 : 0) << (n-x) << ((nl-y) * N);
-          wl |= (board[j] === WHITE ? 1 : 0) << (n-x) << ((nl-y) * N);
+          bl |= (board[j] === BLACK ? 1 : 0) << (n - x) << ((nl - y) * N);
+          wl |= (board[j] === WHITE ? 1 : 0) << (n - x) << ((nl - y) * N);
         }
       }
     }
@@ -341,12 +399,12 @@ var othello = {};
 
   function shiftUp(u, l) {
     return (u << N) |
-           (l >>> (N * (N2 - 1)));
+      (l >>> (N * (N2 - 1)));
   }
 
   function shiftDown(u, l) {
     return (l >>> N) |
-           ((u & 0x000000ff) << (N * (N2 - 1)));
+      ((u & 0x000000ff) << (N * (N2 - 1)));
   }
 
   function listAttackableBitsAtUp(ou, ol, _du, _dl, eu, el) {
@@ -576,7 +634,7 @@ var othello = {};
             (x === 0 || x === N - 1 ? 10 : 1) *
             (y === 0 || y === N - 1 ? 10 : 1);
       t[ix(0, 1)] = t[ix(0, N - 2)] = t[ix(N - 1, 1)] = t[ix(N - 1, N - 2)] =
-      t[ix(1, 0)] = t[ix(N - 2, 0)] = t[ix(1, N - 1)] = t[ix(N - 2, N - 1)] = 0;
+        t[ix(1, 0)] = t[ix(N - 2, 0)] = t[ix(1, N - 1)] = t[ix(N - 2, N - 1)] = 0;
       return t;
     })()),
     edgesAndCorners: makeScorePositionWith((function () {
@@ -592,13 +650,13 @@ var othello = {};
         t[ix(0, y)] = 10;
         t[ix(N - 1, y)] = 10;
       }
-      t[ix(0,     1    )] = t[ix(1,     0    )] = t[ix(1,     1    )] =
-      t[ix(N - 1, 1    )] = t[ix(N - 2, 0    )] = t[ix(N - 2, 1    )] =
-      t[ix(1,     N - 1)] = t[ix(0,     N - 2)] = t[ix(1,     N - 2)] =
-      t[ix(N - 2, N - 1)] = t[ix(N - 1, N - 2)] = t[ix(N - 2, N - 2)] = -1;
+      t[ix(0, 1)] = t[ix(1, 0)] = t[ix(1, 1)] =
+        t[ix(N - 1, 1)] = t[ix(N - 2, 0)] = t[ix(N - 2, 1)] =
+        t[ix(1, N - 1)] = t[ix(0, N - 2)] = t[ix(1, N - 2)] =
+        t[ix(N - 2, N - 1)] = t[ix(N - 1, N - 2)] = t[ix(N - 2, N - 2)] = -1;
 
       t[ix(0, 0)] = t[ix(0, N - 1)] =
-      t[ix(N - 1, 0)] = t[ix(N - 1, N - 1)] = 100;
+        t[ix(N - 1, 0)] = t[ix(N - 1, N - 1)] = 100;
       return t;
     })()),
     moveCount: function (gameTree, player) {
@@ -606,7 +664,7 @@ var othello = {};
     },
     moveCountAndPositions: function (gameTree, player) {
       return scorePositions.moveCount(gameTree, player) +
-             scorePositions.edgesAndCorners(gameTree, player);
+        scorePositions.edgesAndCorners(gameTree, player);
     }
   };
 
@@ -685,12 +743,12 @@ var othello = {};
     if (1 <= gameTree.moves.length) {
       var judge =
         gameTree.player === player ?
-        Math.max :
-        Math.min;
+          Math.max :
+          Math.min;
       var rate =
         gameTree.player === player ?
-        calculateMaxRatings :
-        calculateMinRatings;
+          calculateMaxRatings :
+          calculateMinRatings;
       return judge.apply(null, rate(gameTree, player, lowerLimit, upperLimit, scorePosition));
     } else {
       return scorePosition(gameTree, player);
@@ -765,7 +823,7 @@ var othello = {};
       node.backpropagate(won);
     }
 
-    var vs = root.childNodes.map(function (n) {return n.visits;});
+    var vs = root.childNodes.map(function (n) { return n.visits; });
     return root.childNodes[vs.indexOf(Math.max.apply(null, vs))].move;
   }
 
@@ -783,7 +841,7 @@ var othello = {};
     var totalVisits = this.visits;
     var values = this.childNodes.map(function (n) {
       return n.wins / n.visits +
-             Math.sqrt(2 * Math.log(totalVisits) / n.visits);
+        Math.sqrt(2 * Math.log(totalVisits) / n.visits);
     });
     return this.childNodes[values.indexOf(Math.max.apply(null, values))];
   };
@@ -856,8 +914,8 @@ var othello = {};
       var s = 0;
       var eachTries =
         iterStyle === 'm'
-        ? maxTries
-        : Math.floor(maxTries / moveCount)
+          ? maxTries
+          : Math.floor(maxTries / moveCount)
           + (m === lastMove ? maxTries % moveCount : 0);
       for (var i = 0; i < eachTries; i++)
         s += simulateRandomGame(m, rootGameTree.player);
