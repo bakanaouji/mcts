@@ -101,6 +101,7 @@
         var newGameTree = O.force(ai.findTheBestMove(gameTree).gameTreePromise);
         var end = Date.now();
         var delta = end - start;
+        console.log(delta);
         setTimeout(
           function () {
             shiftToNewGameTree(newGameTree);
