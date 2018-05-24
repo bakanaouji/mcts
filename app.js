@@ -86,8 +86,6 @@
    */
   function setUpUIToReset() {
     resetGame();
-    if ($('#repeat-games:checked').length)
-      startNewGame();
   }
 
   /**
@@ -105,7 +103,7 @@
           function () {
             shiftToNewGameTree(newGameTree);
           },
-          Math.max(500 - delta, 1)
+          Math.max(100 - delta, 1)
         );
       },
       1

@@ -534,6 +534,7 @@ var othello = {};
       var tokens = playerType.split('-');
       var aiType = tokens[0];
       var level = parseInt(tokens[1]);
+      console.log(level);
       var extras = tokens.slice(2);
       var scorePosition = scorePositions[aiType];
       if (scorePosition !== undefined) {
