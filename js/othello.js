@@ -1,34 +1,3 @@
-// Core logic {{{1
-
-var N = 8;
-
-var EMPTY = 'empty';
-var WHITE = 'white';
-var BLACK = 'black';
-
-/**
- * 盤面を初期化する
- */
-function makeInitialGameBoard() {
-  // 盤面情報（empty，white，black）
-  var board = [];
-
-  // 盤面をすべてemptyに初期化
-  for (var x = 0; x < N; x++)
-    for (var y = 0; y < N; y++)
-      board[ix(x, y)] = EMPTY;
-
-  // 中心の4マスにwhiteとblackを配置
-  var x2 = N >> 1;
-  var y2 = N >> 1;
-  board[ix(x2 - 1, y2 - 1)] = WHITE;
-  board[ix(x2 - 1, y2 - 0)] = BLACK;
-  board[ix(x2 - 0, y2 - 1)] = BLACK;
-  board[ix(x2 - 0, y2 - 0)] = WHITE;
-
-  return board;
-}
-
 /**
  * 可能な行動のリストを取得
  */
