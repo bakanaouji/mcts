@@ -21,6 +21,9 @@ var othello = {};
     };
   }
 
+  /**
+   * 遅延評価していた処理を実行
+   */
   function force(promise) {
     return promise();
   }
@@ -87,16 +90,41 @@ var othello = {};
     return {
       board: board,
       player: player,
-      moves: listPossibleMoves(board, player, wasPassed)
+      moves: possibleMoveList(board, player, wasPassed)
     };
   }
 
   /**
    * 可能な行動のリストを取得
    */
-  function listPossibleMoves(board, player, wasPassed) {
+  function possibleMoveList(board, player, wasPassed) {
+    var moves = [];
+
+    // 石を置くことができる行動を列挙していく
+    for (var y = 0; y < N; y++) {
+      for (var x = 0; x < N; x++) {
+        var vulnerableCells = listVulnerableCells(board, x, y, player);
+        if (canAttack(vulnerableCells)) {
+          moves.push({
+            x: x,
+            y: y,
+            gameTreePromise: (function (x, y, vulnerableCells) {
+              return delay(function () {
+                return makeGameTree(
+                  makeAttackedBoard(board, x, y, vulnerableCells, player),
+                  nextPlayer(player),
+                  false
+                );
+              });
+            })(x, y, vulnerableCells)
+          });
+        }
+      }
+    }
+
+    // 必要であればパスする手も加えて返す
     return completePassingMove(
-      listAttackingMoves(board, player),
+      moves,
       board,
       player,
       wasPassed
@@ -124,37 +152,6 @@ var othello = {};
     else {
       return [];
     }
-  }
-
-  /**
-   * 可能な行動のリストを取得
-   */
-  function listAttackingMoves(board, player) {
-    var moves = [];
-
-    // 石を置くことができる行動を列挙していく
-    for (var y = 0; y < N; y++) {
-      for (var x = 0; x < N; x++) {
-        var vulnerableCells = listVulnerableCells(board, x, y, player);
-        if (canAttack(vulnerableCells)) {
-          moves.push({
-            x: x,
-            y: y,
-            gameTreePromise: (function (x, y, vulnerableCells) {
-              return delay(function () {
-                return makeGameTree(
-                  makeAttackedBoard(board, x, y, vulnerableCells, player),
-                  nextPlayer(player),
-                  false
-                );
-              });
-            })(x, y, vulnerableCells)
-          });
-        }
-      }
-    }
-
-    return moves;
   }
 
   /**
