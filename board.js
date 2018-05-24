@@ -49,9 +49,9 @@ function drawGameBoard(board, player, moves) {
         htmlStyleFromBoard.push('<td class="');
         htmlStyleFromBoard.push('cell');
         htmlStyleFromBoard.push(' ');
-        htmlStyleFromBoard.push(attackable[x + y * N] ? player : board[[x, y]]);
+        htmlStyleFromBoard.push(attackable[ix(x, y)] ? player : board[[x, y]]);
         htmlStyleFromBoard.push(' ');
-        htmlStyleFromBoard.push(attackable[x + y * N] ? 'attackable' : '');
+        htmlStyleFromBoard.push(attackable[ix(x, y)] ? 'attackable' : '');
         htmlStyleFromBoard.push('" id="');
         htmlStyleFromBoard.push('cell_' + x + '_' + y);
         htmlStyleFromBoard.push('">');
