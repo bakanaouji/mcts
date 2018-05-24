@@ -127,9 +127,13 @@ var othello = {};
     }
   }
 
-  function listAttackingMovesN(board, player, nest) {
+  /**
+   * 可能な行動のリストを取得
+   */
+  function listAttackingMoves(board, player, nest) {
     var moves = [];
 
+    // 石を置くことができる行動を列挙していく
     for (var y = 0; y < N; y++) {
       for (var x = 0; x < N; x++) {
         var vulnerableCells = listVulnerableCells(board, x, y, player);
@@ -154,8 +158,6 @@ var othello = {};
 
     return moves;
   }
-
-  var listAttackingMoves = listAttackingMovesN;
 
   /**
    * 次の手番のプレイヤーを取得
