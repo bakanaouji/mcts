@@ -5,22 +5,6 @@ var othello = {};
 
   // Utilities {{{1
 
-  function memoize(f) {
-    var memo = {};
-    var first = 0;
-    var second = 0;
-    return function () {
-      var key = JSON.stringify(arguments);
-      if (memo[key] === undefined) {
-        memo[key] = f.apply(this, arguments);
-        first++;
-      } else {
-        second++;
-      }
-      return memo[key];
-    };
-  }
-
   function delay(expressionAsFunction) {
     var result;
     var isEvaluated = false;
@@ -36,10 +20,6 @@ var othello = {};
 
   function force(promise) {
     return promise();
-  }
-
-  function sum(ns) {
-    return ns.reduce(function (t, n) {return t + n;});
   }
 
   function random(n) {
@@ -534,7 +514,6 @@ var othello = {};
       var tokens = playerType.split('-');
       var aiType = tokens[0];
       var level = parseInt(tokens[1]);
-      console.log(level);
       var extras = tokens.slice(2);
       var scorePosition = scorePositions[aiType];
       if (scorePosition !== undefined) {
