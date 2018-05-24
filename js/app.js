@@ -45,29 +45,6 @@ function drawGameBoard(board, player, moves) {
   $('#current-player-name').text(player);
 }
 
-/**
- * AIによって手を選択して進める
- */
-function selectMoveByAI(gameTree, ai) {
-  $('#message').text('Now thinking...');
-  setTimeout(
-    function () {
-      var start = Date.now();
-      var newGameTree = force(ai.findTheBestMove(gameTree).gameTreePromise);
-      var end = Date.now();
-      var delta = end - start;
-      console.log(delta);
-      setTimeout(
-        function () {
-          shiftToNewGameTree(newGameTree);
-        },
-        Math.max(100 - delta, 1)
-      );
-    },
-    1
-  );
-}
-
 var playerTable = {};
 
 function makePlayer(playerType) {
