@@ -30,9 +30,15 @@ function makeInitialGameBoard() {
 /**
  * 盤面を描画する
  */
-function drawGameBoard(board, player) {
+function drawGameBoard(board, player, moves) {
   // 盤面の情報をhtml形式に変換した文字列
   var htmlStyleFromBoard = [];
+  var attackable = [];
+  moves.forEach(function (m) {
+    if (!m.isPassingMove) {
+      attackable[m.x + m.y * N] = true;
+    }
+  });
 
   // tableタグを使って表現
   htmlStyleFromBoard.push('<table>');
@@ -43,7 +49,11 @@ function drawGameBoard(board, player) {
         htmlStyleFromBoard.push('<td class="');
         htmlStyleFromBoard.push('cell');
         htmlStyleFromBoard.push(' ');
-        htmlStyleFromBoard.push(board[[x, y]]);
+        htmlStyleFromBoard.push(attackable[x + y * N] ? player : board[[x, y]]);
+        htmlStyleFromBoard.push(' ');
+        htmlStyleFromBoard.push(attackable[x + y * N] ? 'attackable' : '');
+        htmlStyleFromBoard.push('" id="');
+        htmlStyleFromBoard.push('cell_' + x + '_' + y);
         htmlStyleFromBoard.push('">');
         htmlStyleFromBoard.push('<span class="disc"></span>');
         htmlStyleFromBoard.push('</td>');
