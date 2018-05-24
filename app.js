@@ -90,6 +90,9 @@
       startNewGame();
   }
 
+  /**
+   * AIによって手を選択して進める
+   */
   function chooseMoveByAI(gameTree, ai) {
     $('#message').text('Now thinking...');
     setTimeout(
@@ -142,12 +145,6 @@
     return $('#white-player-type').val();
   }
 
-  function swapPlayerTypes() {
-    var t = $('#black-player-type').val();
-    $('#black-player-type').val($('#white-player-type').val()).change();
-    $('#white-player-type').val(t).change();
-  }
-
   function shiftToNewGameTree(gameTree) {
     drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
     resetUI();
@@ -181,7 +178,6 @@
 
   $('#start-button').click(function () {startNewGame();});
   $('#add-new-ai-button').click(function () {O.addNewAI();});
-  $('#swap-player-types-button').click(function () {swapPlayerTypes();});
   resetGame();
   drawGameBoard(O.makeInitialGameBoard(), '-', []);
 
