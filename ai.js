@@ -26,7 +26,7 @@ function findBestMoveByAI(gameTree) {
     // var maxRating = Math.max.apply(null, ratings);
     // return gameTree.moves[ratings.indexOf(maxRating)];
     // return tryPrimitiveMonteCarloSimulation(gameTree, 100);
-    return tryMonteCarloTreeSearch(gameTree, 2048);
+    return tryMonteCarloTreeSearch(gameTree, 4096);
 }
 
 /**

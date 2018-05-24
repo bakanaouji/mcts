@@ -63,7 +63,7 @@ function showWinner(board) {
 
     for (var x = 0; x < N; ++x) {
         for (var y = 0; y < N; ++y) {
-            ++nt[board[[x, y]]];
+            ++nt[board[ix(x, y)]];
         }
     }
 
