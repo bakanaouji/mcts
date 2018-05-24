@@ -3,51 +3,64 @@
 
   // UI {{{1
 
+  /**
+   * 盤面を描画する
+   */
   function drawGameBoard(board, player, moves) {
-    var ss = [];
+    // 盤面の情報をhtml形式に変換した文字列
+    var htmlStyleFromBoard = [];
     var attackable = [];
     moves.forEach(function (m) {
       if (!m.isPassingMove)
         attackable[O.ix(m.x, m.y)] = true;
     });
 
-    ss.push('<table>');
+    // tableタグを使って表現
+    htmlStyleFromBoard.push('<table>');
     for (var y = -1; y < O.N; y++) {
-      ss.push('<tr>');
+      htmlStyleFromBoard.push('<tr>');
       for (var x = -1; x < O.N; x++) {
         if (0 <= y && 0 <= x) {
-          ss.push('<td class="');
-          ss.push('cell');
-          ss.push(' ');
-          ss.push(attackable[O.ix(x, y)] ? player : board[O.ix(x, y)]);
-          ss.push(' ');
-          ss.push(attackable[O.ix(x, y)] ? 'attackable' : '');
-          ss.push('" id="');
-          ss.push('cell_' + x + '_' + y);
-          ss.push('">');
-          ss.push('<span class="disc"></span>');
-          ss.push('</td>');
+          htmlStyleFromBoard.push('<td class="');
+          htmlStyleFromBoard.push('cell');
+          htmlStyleFromBoard.push(' ');
+          htmlStyleFromBoard.push(attackable[O.ix(x, y)] ? player : board[O.ix(x, y)]);
+          htmlStyleFromBoard.push(' ');
+          htmlStyleFromBoard.push(attackable[O.ix(x, y)] ? 'attackable' : '');
+          htmlStyleFromBoard.push('" id="');
+          htmlStyleFromBoard.push('cell_' + x + '_' + y);
+          htmlStyleFromBoard.push('">');
+          htmlStyleFromBoard.push('<span class="disc"></span>');
+          htmlStyleFromBoard.push('</td>');
         } else if (0 <= x && y === -1) {
-          ss.push('<th>' + String.fromCharCode('a'.charCodeAt(0)+x) + '</th>');
+          htmlStyleFromBoard.push('<th>' + String.fromCharCode('a'.charCodeAt(0)+x) + '</th>');
         } else if (x === -1 && 0 <= y) {
-          ss.push('<th>' + (y + 1) + '</th>');
+          htmlStyleFromBoard.push('<th>' + (y + 1) + '</th>');
         } else /* if (x === -1 && y === -1) */ {
-          ss.push('<th></th>');
+          htmlStyleFromBoard.push('<th></th>');
         }
       }
-      ss.push('</tr>');
+      htmlStyleFromBoard.push('</tr>');
     }
-    ss.push('</table>');
+    htmlStyleFromBoard.push('</table>');
 
-    $('#game-board').html(ss.join(''));
+    // tableタグを使って表現
+    $('#game-board').html(htmlStyleFromBoard.join(''));
+    // tableタグを使って表現
     $('#current-player-name').text(player);
   }
 
+  /**
+   * UIをリセット
+   */
   function resetUI() {
     $('#console').empty();
     $('#message').empty();
   }
 
+  /**
+   * 選択できる行動を表示
+   */
   function setUpUIToChooseMove(gameTree) {
     $('#message').text('Choose your move.');
     gameTree.moves.forEach(function (m, i) {
@@ -68,13 +81,15 @@
     });
   }
 
+  /**
+   * 新しくゲームを始めるためのボタンを表示
+   */
   function setUpUIToReset() {
     resetGame();
     if ($('#repeat-games:checked').length)
       startNewGame();
   }
 
-  var minimumDelayForAI = 500;  // milliseconds
   function chooseMoveByAI(gameTree, ai) {
     $('#message').text('Now thinking...');
     setTimeout(
@@ -87,13 +102,16 @@
           function () {
             shiftToNewGameTree(newGameTree);
           },
-          Math.max(minimumDelayForAI - delta, 1)
+          Math.max(500 - delta, 1)
         );
       },
       1
     );
   }
 
+  /**
+   * 結果を表示
+   */
   function showWinner(board) {
     var r = O.judge(board);
     $('#message').text(
@@ -135,32 +153,10 @@
     resetUI();
     if (gameTree.moves.length === 0) {
       showWinner(gameTree.board);
-      recordStat(gameTree.board);
-      if ($('#repeat-games:checked').length)
-        showStat();
       setUpUIToReset();
     } else {
       playerTable[gameTree.player](gameTree);
     }
-  }
-
-  var stats = {};
-
-  function recordStat(board) {
-    var s = stats[[blackPlayerType(), whitePlayerType()]] || {b: 0, w: 0, d: 0};
-    var r = O.judge(board);
-    if (r === 1)
-      s.b++;
-    if (r === 0)
-      s.d++;
-    if (r === -1)
-      s.w++;
-    stats[[blackPlayerType(), whitePlayerType()]] = s;
-  }
-
-  function showStat() {
-    var s = stats[[blackPlayerType(), whitePlayerType()]];
-    $('#stats').text('Black: ' + s.b + ', White: ' + s.w + ', Draw: ' + s.d);
   }
 
   function resetGame() {
