@@ -9,20 +9,20 @@ var BLACK = 'black';
  */
 function makeInitialGameBoard() {
   // 盤面情報（empty、white、black）
-  var board = {};
+  var board = [];
 
   // 盤面をすべてemptyに初期化
   for (var x = 0; x < N; x++)
     for (var y = 0; y < N; y++)
-      board[[x, y]] = EMPTY;
+      board[ix(x, y)] = EMPTY;
 
   // 中心の4マスにwhiteとblackを配置
   var centerX = Math.floor(N / 2);
   var centerY = Math.floor(N / 2);
-  board[[centerX - 1, centerY - 1]] = WHITE;
-  board[[centerX - 1, centerY - 0]] = BLACK;
-  board[[centerX - 0, centerY - 1]] = BLACK;
-  board[[centerX - 0, centerY - 0]] = WHITE;
+  board[ix(centerX - 1, centerY - 1)] = WHITE;
+  board[ix(centerX - 1, centerY - 0)] = BLACK;
+  board[ix(centerX - 0, centerY - 1)] = BLACK;
+  board[ix(centerX - 0, centerY - 0)] = WHITE;
 
   return board;
 }
@@ -49,7 +49,7 @@ function drawGameBoard(board, player, moves) {
         htmlStyleFromBoard.push('<td class="');
         htmlStyleFromBoard.push('cell');
         htmlStyleFromBoard.push(' ');
-        htmlStyleFromBoard.push(attackable[ix(x, y)] ? player : board[[x, y]]);
+        htmlStyleFromBoard.push(attackable[ix(x, y)] ? player : board[ix(x, y)]);
         htmlStyleFromBoard.push(' ');
         htmlStyleFromBoard.push(attackable[ix(x, y)] ? 'attackable' : '');
         htmlStyleFromBoard.push('" id="');

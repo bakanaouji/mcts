@@ -152,10 +152,8 @@ function judge(board) {
     n[BLACK] = 0;
     n[WHITE] = 0;
     n[EMPTY] = 0;
-    for (var x = 0; x < N; x++) {
-        for (var y = 0; y < N; y++) {
-            ++n[board[[x, y]]];
-        }
+    for (var i = 0; i < board.length; ++i) {
+        ++n[board[i]];
     }
     if (n[BLACK] > n[WHITE]) {
         return 1;

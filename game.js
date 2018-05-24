@@ -79,7 +79,7 @@ function turnableCellList(board, x, y, player) {
     var turnableCells = [];
 
     // すでに石が置いてあったら置くことはできないので、どこもひっくりかえせない
-    if (board[[x, y]] != EMPTY) {
+    if (board[ix(x, y)] != EMPTY) {
         return turnableCells;
     }
 
@@ -100,10 +100,10 @@ function turnableCellList(board, x, y, player) {
                     break;
                 }
                 // 自分の石が存在していたら、その間にある石をひっくりかえせる石として追加
-                var cell = board[[nx, ny]];
+                var cell = board[ix(nx, ny)];
                 if (cell == player && 2 <= i) {
                     for (var j = 0; j < i; ++j) {
-                        turnableCells.push([x + j * dx, y + j * dy]);
+                        turnableCells.push(ix(x + j * dx, y + j * dy));
                     }
                     break;
                 } 
@@ -122,7 +122,8 @@ function turnableCellList(board, x, y, player) {
  * 指定の位置に石を置き、更新後の盤面を取得する
  */
 function makeNextBoard(board, x, y, turnableCells, player) {
-    var newBoard = JSON.parse(JSON.stringify(board));
+    var newBoard = board.slice();
+    newBoard[ix(x, y)] = player;
     // ひっくりかえせる石をすべてひっくりかえす
     for (var i = 0; i < turnableCells.length; ++i) {
         newBoard[turnableCells[i]] = player;
