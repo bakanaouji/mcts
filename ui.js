@@ -15,14 +15,29 @@ function makeLavelForMove(move) {
 function setupUIToSelectMove(gameTree) {
     $('#message').text('Select your move.');
     gameTree.moves.forEach(function (m, i) {
-        $('#console').append(
-            $('<input type="button" class="btn">')
-            .val(makeLavelForMove(m))
-            .click(function() {
+        if (m.isPassingMove) {
+            $('#console').append(
+                $('<input type="button" class="btn">')
+                .val(nameMove(m))
+                .click(function () {
+                    shiftToNewGameTree(force(m.gameTreePromise));
+                })
+            );
+        } else {
+            $('#cell_' + m.x + '_' + m.y)
+            .click(function () {
                 shiftToNewGameTree(force(m.gameTreePromise));
-            })
-        );
+            });
+        }
     });
+}
+
+function nameMove(move) {
+    if (move.isPassingMove) {
+        return 'Pass';
+    } else {
+        return 'abcdefgh'[move.x] + '12345678'[move.y];
+    }
 }
 
 /**
