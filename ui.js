@@ -10,7 +10,7 @@ function makeLavelForMove(move) {
 }
 
 /**
- * 選択できる行動をボタンで表示
+ * 選択できる行動を表示
  */
 function setupUIToSelectMove(gameTree) {
     $('#message').text('Select your move.');
@@ -18,7 +18,7 @@ function setupUIToSelectMove(gameTree) {
         if (m.isPassingMove) {
             $('#console').append(
                 $('<input type="button" class="btn">')
-                .val(nameMove(m))
+                .val(makeLavelForMove(m))
                 .click(function () {
                     shiftToNewGameTree(force(m.gameTreePromise));
                 })
@@ -30,14 +30,6 @@ function setupUIToSelectMove(gameTree) {
             });
         }
     });
-}
-
-function nameMove(move) {
-    if (move.isPassingMove) {
-        return 'Pass';
-    } else {
-        return 'abcdefgh'[move.x] + '12345678'[move.y];
-    }
 }
 
 /**
