@@ -21,19 +21,20 @@ function possibleMoveList(board, player, wasPassed) {
     // 石を置くことができる行動を列挙していく
     for (var x = 0; x < N; ++x) {
         for (var y = 0; y < N; ++y) {
+            var turnableCells = turnableCellList(board, x, y, player);
             if (canAttack(board, x, y, player)) {
                 possibleMoves.push({
                     x: x,
                     y: y,
-                    gameTreePromise: (function (x, y) {
+                    gameTreePromise: (function (x, y, turnableCells) {
                         return delay(function () {
                             return makeGameTree(
-                                makeNextBoard(board, x, y, player),
+                                makeNextBoard(board, x, y, turnableCells, player),
                                 nextPlayer(player),
                                 false
                             );
                         });
-                    })(x, y)
+                    })(x, y, turnableCells)
                 });
             }
         }
@@ -120,10 +121,9 @@ function turnableCellList(board, x, y, player) {
 /**
  * 指定の位置に石を置き、更新後の盤面を取得する
  */
-function makeNextBoard(board, x, y, player) {
+function makeNextBoard(board, x, y, turnableCells, player) {
     var newBoard = JSON.parse(JSON.stringify(board));
     // ひっくりかえせる石をすべてひっくりかえす
-    var turnableCells = turnableCellList(board, x, y, player);
     for (var i = 0; i < turnableCells.length; ++i) {
         newBoard[turnableCells[i]] = player;
     }
