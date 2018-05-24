@@ -1,76 +1,167 @@
-var N = 8;
-
-var EMPTY = 'empty';
-var WHITE = 'white';
-var BLACK = 'black';
-
 /**
- * 盤面を初期化する
+ * 次の手番のプレイヤーを取得
  */
-function makeInitialGameBoard() {
-  // 盤面情報（empty、white、black）
-  var board = {};
-
-  // 盤面をすべてemptyに初期化
-  for (var x = 0; x < N; x++)
-    for (var y = 0; y < N; y++)
-      board[[x, y]] = EMPTY;
-
-  // 中心の4マスにwhiteとblackを配置
-  var centerX = Math.floor(N / 2);
-  var centerY = Math.floor(N / 2);
-  board[[centerX - 1, centerY - 1]] = WHITE;
-  board[[centerX - 1, centerY - 0]] = BLACK;
-  board[[centerX - 0, centerY - 1]] = BLACK;
-  board[[centerX - 0, centerY - 0]] = WHITE;
-
-  return board;
+function nextPlayer(player) {
+    return (player == BLACK ? WHITE : BLACK);
 }
 
 /**
- * 盤面を描画する
+ * 指定の位置に石を置くことができるかどうか
  */
-function drawGameBoard(board, player, moves) {
-  // 盤面の情報をhtml形式に変換した文字列
-  var htmlStyleFromBoard = [];
-  var attackable = [];
-  moves.forEach(function (m) {
-    if (!m.isPassingMove) {
-      attackable[m.x + m.y * N] = true;
-    }
-  });
+function canAttack(board, x, y, player) {
+    return turnableCellList(board, x, y, player).length;
+}
 
-  // tableタグを使って表現
-  htmlStyleFromBoard.push('<table>');
-  for (var y = -1; y < N; y++) {
-    htmlStyleFromBoard.push('<tr>');
-    for (var x = -1; x < N; x++) {
-      if (0 <= y && 0 <= x) {
-        htmlStyleFromBoard.push('<td class="');
-        htmlStyleFromBoard.push('cell');
-        htmlStyleFromBoard.push(' ');
-        htmlStyleFromBoard.push(attackable[x + y * N] ? player : board[[x, y]]);
-        htmlStyleFromBoard.push(' ');
-        htmlStyleFromBoard.push(attackable[x + y * N] ? 'attackable' : '');
-        htmlStyleFromBoard.push('" id="');
-        htmlStyleFromBoard.push('cell_' + x + '_' + y);
-        htmlStyleFromBoard.push('">');
-        htmlStyleFromBoard.push('<span class="disc"></span>');
-        htmlStyleFromBoard.push('</td>');
-      } else if (0 <= x && y == -1) {
-        htmlStyleFromBoard.push('<th>' + 'abcdefgh'[x] + '</th>');
-      } else if (x == -1 && 0 <= y) {
-        htmlStyleFromBoard.push('<th>' + '12345678'[y] + '</th>');
-      } else /* if (x == -1 && y == -1) */ {
-        htmlStyleFromBoard.push('<th></th>');
-      }
-    }
-    htmlStyleFromBoard.push('</tr>');
-  }
-  htmlStyleFromBoard.push('</table>');
+/**
+ * 可能な行動のリストを取得
+ */
+function possibleMoveList(board, player, wasPassed) {
+    var possibleMoves = [];
 
-  // #game-boardに差し込む
-  $('#game-board').html(htmlStyleFromBoard.join(''));
-  // 現在のプレイヤーを表示
-  $('#current-player-name').text(player);
+    // 石を置くことができる行動を列挙していく
+    for (var x = 0; x < N; ++x) {
+        for (var y = 0; y < N; ++y) {
+            if (canAttack(board, x, y, player)) {
+                possibleMoves.push({
+                    x: x,
+                    y: y,
+                    gameTreePromise: (function (x, y) {
+                        return delay(function () {
+                            return makeGameTree(
+                                makeNextBoard(board, x, y, player),
+                                nextPlayer(player),
+                                false
+                            );
+                        });
+                    })(x, y)
+                });
+            }
+        }
+    }
+
+    // 必要であればパスする手も加えて返す
+    return completePassingMove(
+        possibleMoves,
+        board,
+        player,
+        wasPassed
+    );
+}
+
+/**
+ * 必要であればパスする手を補完して取りうる行動を返す
+ */
+function completePassingMove(moves, board, player, wasPassed) {
+    // どこかしらに石を置けるならそのまま返す
+    if (0 < moves.length) {
+        return moves;
+    } 
+    // 前に相手がパスしていなかったら、パスできる
+    else if (!wasPassed) {
+        return [{
+            isPassingMove: true,
+            gameTreePromise: delay(function () {
+                return makeGameTree(board, nextPlayer(player), true);
+            })
+        }];
+    } 
+    // 前に相手がパスしていたら、ゲーム終了
+    else {
+        return [];
+    }
+}
+
+/**
+ * 指定の位置に石を置いたときにひっくりかえせる石のリストを取得
+ */
+function turnableCellList(board, x, y, player) {
+    var turnableCells = [];
+
+    // すでに石が置いてあったら置くことはできないので、どこもひっくりかえせない
+    if (board[[x, y]] != EMPTY) {
+        return turnableCells;
+    }
+
+    var opponent = nextPlayer(player);
+    for (var dx = -1; dx <= 1; ++dx) {
+        for (var dy = -1; dy <= 1; ++dy) {
+            // 石を置く位置はチェックする必要なし
+            if (dx == 0 && dy == 0) {
+                continue;
+            }
+            // 上下左右斜め方向に自分の石が存在していたら、
+            // その間にある石をひっくりかえせる
+            for (var i = 1; i < N; ++i) {
+                var nx = x + i * dx;
+                var ny = y + i * dy;
+                // 盤面からはみ出ていたらチェックできない
+                if (nx < 0 || N <= nx || ny < 0 || N <= ny) {
+                    break;
+                }
+                // 自分の石が存在していたら、その間にある石をひっくりかえせる石として追加
+                var cell = board[[nx, ny]];
+                if (cell == player && 2 <= i) {
+                    for (var j = 0; j < i; ++j) {
+                        turnableCells.push([x + j * dx, y + j * dy]);
+                    }
+                    break;
+                } 
+                // 相手の石が存在していなかったら，チェックできない
+                if (cell != opponent) {
+                    break;
+                }
+            }
+        }
+    }
+
+    return turnableCells;
+}
+
+/**
+ * 指定の位置に石を置き、更新後の盤面を取得する
+ */
+function makeNextBoard(board, x, y, player) {
+    var newBoard = JSON.parse(JSON.stringify(board));
+    // ひっくりかえせる石をすべてひっくりかえす
+    var turnableCells = turnableCellList(board, x, y, player);
+    for (var i = 0; i < turnableCells.length; ++i) {
+        newBoard[turnableCells[i]] = player;
+    }
+    return newBoard;
+}
+
+/**
+ * ゲームをリセット
+ */
+function resetGame() {
+    shiftToNewGameTree(makeGameTree(makeInitialGameBoard(), BLACK, false));
+}
+
+/**
+ * 次の局面へ移動する
+ */
+function shiftToNewGameTree(gameTree) {
+    // 盤面を描画する
+    drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
+    // UIを初期化
+    resetUI();
+    // ゲームが終了していたら，勝者を表示
+    if (gameTree.moves.length == 0) {
+        showWinner(gameTree.board);
+        setupUIToReset();
+    } 
+    // ゲームが終了していなかったら打てる手を表示
+    else {
+        var playerTypeTable = {};
+        playerTypeTable[BLACK] = $('#black-player-type').val();
+        playerTypeTable[WHITE] = $('#white-player-type').val();
+        var playerType = playerTypeTable[gameTree.player];
+        if (playerType == 'human') {
+            setupUIToSelectMove(gameTree);
+        } 
+        // AIの手番であればUIを表示せずに進める
+        else {
+            selectMoveByAI(gameTree);
+        }
+    }
 }
