@@ -1,57 +1,76 @@
-#main
-{
-  text-align: center;
+var N = 8;
+
+var EMPTY = 'empty';
+var WHITE = 'white';
+var BLACK = 'black';
+
+/**
+ * 盤面を初期化する
+ */
+function makeInitialGameBoard() {
+  // 盤面情報（empty、white、black）
+  var board = {};
+
+  // 盤面をすべてemptyに初期化
+  for (var x = 0; x < N; x++)
+    for (var y = 0; y < N; y++)
+      board[[x, y]] = EMPTY;
+
+  // 中心の4マスにwhiteとblackを配置
+  var centerX = Math.floor(N / 2);
+  var centerY = Math.floor(N / 2);
+  board[[centerX - 1, centerY - 1]] = WHITE;
+  board[[centerX - 1, centerY - 0]] = BLACK;
+  board[[centerX - 0, centerY - 1]] = BLACK;
+  board[[centerX - 0, centerY - 0]] = WHITE;
+
+  return board;
 }
 
-#game-board > table
-{
-  margin: 0 auto;
-}
+/**
+ * 盤面を描画する
+ */
+function drawGameBoard(board, player, moves) {
+  // 盤面の情報をhtml形式に変換した文字列
+  var htmlStyleFromBoard = [];
+  var attackable = [];
+  moves.forEach(function (m) {
+    if (!m.isPassingMove) {
+      attackable[m.x + m.y * N] = true;
+    }
+  });
 
-#game-board > table th
-{
-  margin: 0;
-  padding: 0.125em 0.25em;
-  line-height: 100%;
-}
+  // tableタグを使って表現
+  htmlStyleFromBoard.push('<table>');
+  for (var y = -1; y < N; y++) {
+    htmlStyleFromBoard.push('<tr>');
+    for (var x = -1; x < N; x++) {
+      if (0 <= y && 0 <= x) {
+        htmlStyleFromBoard.push('<td class="');
+        htmlStyleFromBoard.push('cell');
+        htmlStyleFromBoard.push(' ');
+        htmlStyleFromBoard.push(attackable[x + y * N] ? player : board[[x, y]]);
+        htmlStyleFromBoard.push(' ');
+        htmlStyleFromBoard.push(attackable[x + y * N] ? 'attackable' : '');
+        htmlStyleFromBoard.push('" id="');
+        htmlStyleFromBoard.push('cell_' + x + '_' + y);
+        htmlStyleFromBoard.push('">');
+        htmlStyleFromBoard.push('<span class="disc"></span>');
+        htmlStyleFromBoard.push('</td>');
+      } else if (0 <= x && y == -1) {
+        htmlStyleFromBoard.push('<th>' + 'abcdefgh'[x] + '</th>');
+      } else if (x == -1 && 0 <= y) {
+        htmlStyleFromBoard.push('<th>' + '12345678'[y] + '</th>');
+      } else /* if (x == -1 && y == -1) */ {
+        htmlStyleFromBoard.push('<th></th>');
+      }
+    }
+    htmlStyleFromBoard.push('</tr>');
+  }
+  htmlStyleFromBoard.push('</table>');
 
-#game-board > table .cell
-{
-  background: #090;
-  border: 1px solid #ccc;
-  padding: 0;
-  margin: 0;
-  line-height: 0;
-}
-#game-board > table .cell.attackable
-{
-  cursor: pointer;
-}
-#game-board > table .cell.attackable:hover
-{
-  background: #cc0;
-}
-#game-board > table .cell > .disc
-{
-  display: inline-block;
-  width: 2em;
-  height: 2em;
-  border-radius: 1em;
-  margin: 0.25em;
-}
-#game-board > table .cell.white > .disc
-{
-  background: #fff;
-}
-#game-board > table .cell.black > .disc
-{
-  background: #000;
-}
-#game-board > table .cell.attackable > .disc
-{
-  opacity: 0.2;
-}
-#game-board > table .cell.attackable:hover > .disc
-{
-  opacity: 1.0;
+  // #game-boardに差し込む
+  $('#game-board').html(htmlStyleFromBoard.join(''));
+  // 現在のプレイヤーを表示
+  $('#current-player-name').text(player);
 }
