@@ -61,8 +61,8 @@
   /**
    * 選択できる行動を表示
    */
-  function setUpUIToChooseMove(gameTree) {
-    $('#message').text('Choose your move.');
+  function setupUIToSelectMove(gameTree) {
+    $('#message').text('Select your move.');
     gameTree.moves.forEach(function (m, i) {
       if (m.isPassingMove) {
         $('#console').append(
@@ -84,7 +84,7 @@
   /**
    * 新しくゲームを始めるためのボタンを表示
    */
-  function setUpUIToReset() {
+  function setupUIToReset() {
     $('#preference-pane :input')
       .removeClass('disabled')
       .removeAttr('disabled');
@@ -93,7 +93,7 @@
   /**
    * AIによって手を選択して進める
    */
-  function chooseMoveByAI(gameTree, ai) {
+  function selectMoveByAI(gameTree, ai) {
     $('#message').text('Now thinking...');
     setTimeout(
       function () {
@@ -129,11 +129,11 @@
 
   function makePlayer(playerType) {
     if (playerType === 'human') {
-      return setUpUIToChooseMove;
+      return setupUIToSelectMove;
     } else {
       var ai = O.makeAI(playerType);
       return function (gameTree) {
-        chooseMoveByAI(gameTree, ai);
+        selectMoveByAI(gameTree, ai);
       };
     }
   }
@@ -149,7 +149,7 @@
     // ゲームが終了していたら，勝者を表示
     if (gameTree.moves.length === 0) {
       showWinner(gameTree.board);
-      setUpUIToReset();
+      setupUIToReset();
     }
     // ゲームが終了していなかったら次の手の選択に移る
     else {
@@ -177,7 +177,7 @@
   // Startup {{{1
 
   $('#start-button').click(function () { startNewGame(); });
-  setUpUIToReset();
+  setupUIToReset();
   drawGameBoard(O.makeInitialGameBoard(), '-', []);
 
 
