@@ -68,15 +68,22 @@ function tryMonteCarloTreeSearch(rootGameTree, maxTries) {
     }
 
     // 展開していない行動がある場合，ノードを展開する
-    if (node.untriedMoves.length !== 0) {
-      node = node.expandChild();
-    }
+    // if (node.untriedMoves.length !== 0) {
+    //   node = node.expandChild();
+    // }
 
     // ランダムにプレイアウトを実行
     var won = node.simulate(rootGameTree.player);
 
     // back propagationで各ノードを評価
     node.backpropagate(won);
+
+    // ノードに一定回数以上到達した場合，ノードを展開する
+    if (node.visits >= 5) {
+      while (node.untriedMoves.length !== 0) {
+        node.expandChild();
+      }
+    }
   }
 
   var vs = root.childNodes.map(function (n) { return n.visits; });
@@ -92,7 +99,7 @@ function Node(gameTree, parentNode, move) {
   this.move = move;
   this.childNodes = [];
   this.wins = 0;
-  this.visits = 0;
+  this.visits = 1;
   this.untriedMoves = gameTree.moves.slice();
 }
 
@@ -103,7 +110,7 @@ Node.prototype.selectChild = function () {
   var totalVisits = this.visits;
   var values = this.childNodes.map(function (n) {
     return n.wins / n.visits +
-      Math.sqrt(2 * Math.log(totalVisits) / n.visits);
+      0.5 * Math.sqrt(2 * Math.log(totalVisits) / n.visits);
   });
   return this.childNodes[values.indexOf(Math.max.apply(null, values))];
 };
