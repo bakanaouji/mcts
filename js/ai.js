@@ -79,7 +79,7 @@ function tryMonteCarloTreeSearch(rootGameTree, maxTries) {
     node.backpropagate(won);
 
     // ノードに一定回数以上到達した場合，ノードを展開する
-    if (node.visits >= 25) {
+    if (node.visits >= 40) {
       while (node.untriedMoves.length !== 0) {
         node.expandChild();
       }
@@ -113,7 +113,7 @@ Node.prototype.selectChild = function () {
       return 10e10;
     } else {
       return n.wins / n.visits +
-        0.5 * Math.sqrt(2 * Math.log(totalVisits) / n.visits);
+        Math.sqrt(2 * Math.log(totalVisits) / n.visits);
     }
   });
   return this.childNodes[values.indexOf(Math.max.apply(null, values))];
