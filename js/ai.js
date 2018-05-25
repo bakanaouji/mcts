@@ -120,26 +120,6 @@ Node.prototype.update = function (won) {
   this.visits += 1;
 };
 
-Node.prototype.visualize = function (indent) {
-  indent = indent || 0;
-  var ss = [];
-  var i;
-  ss.push('\n');
-  for (i = 0; i < indent; i++) {
-    ss.push('| ');
-  }
-  ss.push('W='); ss.push(this.wins);
-  ss.push('/');
-  ss.push('V='); ss.push(this.visits);
-  ss.push('/');
-  ss.push('U='); ss.push(this.untriedMoves.length);
-  for (i = 0; i < this.childNodes.length; i++) {
-    ss.push(this.childNodes[i].visualize(indent + 1));
-  }
-  return ss.join('');
-};
-
-
 
 
 // AI: Primitive Monte Carlo {{{1
