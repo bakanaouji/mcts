@@ -109,7 +109,7 @@ function Node(gameTree, parentNode, move) {
 Node.prototype.selectChild = function () {
   var totalVisits = this.visits;
   var values = this.childNodes.map(function (n) {
-    if (n.visits == 0) {
+    if (n.visits === 0) {
       return 10e10;
     } else {
       return n.wins / n.visits +
