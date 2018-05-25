@@ -99,7 +99,7 @@ function Node(gameTree, parentNode, move) {
   this.move = move;
   this.childNodes = [];
   this.wins = 0;
-  this.visits = 1;
+  this.visits = 0;
   this.untriedMoves = gameTree.moves.slice();
 }
 
@@ -109,8 +109,12 @@ function Node(gameTree, parentNode, move) {
 Node.prototype.selectChild = function () {
   var totalVisits = this.visits;
   var values = this.childNodes.map(function (n) {
-    return n.wins / n.visits +
-      0.5 * Math.sqrt(2 * Math.log(totalVisits) / n.visits);
+    if (n.visits == 0) {
+      return 10e10;
+    } else {
+      return n.wins / n.visits +
+        0.5 * Math.sqrt(2 * Math.log(totalVisits) / n.visits);
+    }
   });
   return this.childNodes[values.indexOf(Math.max.apply(null, values))];
 };
