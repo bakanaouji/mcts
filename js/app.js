@@ -1,10 +1,10 @@
 var playerTable = {};
 
-function makePlayer(playerType) {
+async function makePlayer(playerType) {
   if (playerType === 'human') {
     return setupUIToSelectMove;
   } else {
-    var ai = makeAI(playerType);
+    var ai = await makeAI(playerType);
     return function (gameTree) {
       selectMoveByAI(gameTree, ai);
     };
@@ -33,13 +33,13 @@ function shiftToNewGameTree(gameTree) {
 /**
  * ゲームを開始
  */
-function startNewGame() {
+async function startNewGame() {
   $('#preference-pane :input')
     .addClass('disabled')
     .attr('disabled', 'disabled');
-  playerTable[BLACK] = makePlayer($('#black-player-type').val());
-
-  playerTable[WHITE] = makePlayer($('#white-player-type').val());
+  
+  playerTable[BLACK] = await makePlayer($('#black-player-type').val());
+  playerTable[WHITE] = await makePlayer($('#white-player-type').val());
 
   shiftToNewGameTree(makeInitialGameTree());
 }
