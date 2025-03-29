@@ -11,7 +11,7 @@ Node::Node(const GameState& s, Node* p, const Move& m)
 Node* Node::selectChild() {
     int totalVisits = visits;
     auto it = std::max_element(children.begin(), children.end(),
-        [totalVisits](const std::unique_ptr<Node>& a, const std::unique_ptr<Node>& b) {
+        [totalVisits, this](const std::unique_ptr<Node>& a, const std::unique_ptr<Node>& b) {
             return a->calculateUCB(totalVisits) < b->calculateUCB(totalVisits);
         });
     return it->get();
@@ -65,7 +65,12 @@ void Node::backpropagate(double result) {
 
 double Node::calculateUCB(int totalVisits) const {
     if (visits == 0) return std::numeric_limits<double>::infinity();
-    double exploitation = static_cast<double>(wins) / visits;
+    
+    bool isRootPlayer = (state.rootPlayer == state.currentPlayer);
+    double exploitation = isRootPlayer ? 
+        static_cast<double>(wins) / visits :
+        static_cast<double>(visits - wins) / visits;
+    
     double exploration = std::sqrt(2.0 * std::log(totalVisits) / visits);
     return exploitation + exploration;
 }
@@ -80,7 +85,7 @@ Move MCTS::findBestMove(const emscripten::val& jsBoard, int player, bool wasPass
         board.push_back(cellValue == "black" ? BLACK : (cellValue == "white" ? WHITE : EMPTY));
     }
     
-    GameState rootState(board, player, wasPassed);
+    GameState rootState(board, player, wasPassed, player);  // rootPlayerを追加
     Node rootNode(rootState);
     
     for (int i = 0; i < maxIterations; i++) {
@@ -166,7 +171,8 @@ GameState MCTS::makeMove(const GameState& state, const Move& move) const {
     if (move.isPass) {
         return GameState(state.board, 
                         state.currentPlayer == BLACK ? WHITE : BLACK, 
-                        true);
+                        true,
+                        state.rootPlayer);  // rootPlayerを引き継ぐ
     }
     
     GameState newState = state;

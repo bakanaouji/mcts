@@ -23,6 +23,8 @@
           Black:
           <select id="black-player-type">
             <option value="human" selected>Human</option>
+            <option value="mcts_js-1024">MCTS_JS_1024</option>
+            <option value="mcts_js-4096">MCTS_JS_4096</option>
             <option value="mcts_wasm-1024">MCTS_WASM_1024</option>
             <option value="mcts_wasm-4096">MCTS_WASM_4096</option>
             <option value="mcts_old-1024">MCTS_OLD_AI</option>
@@ -32,6 +34,8 @@
           White:
           <select id="white-player-type">
             <option value="human">Human</option>
+            <option value="mcts_js-1024">MCTS_JS_1024</option>
+            <option value="mcts_js-4096">MCTS_JS_4096</option>
             <option value="mcts_wasm-1024">MCTS_WASM_1024</option>
             <option value="mcts_wasm-4096">MCTS_WASM_4096</option>
             <option value="mcts_old-1024">MCTS_OLD_AI</option>
@@ -49,6 +53,7 @@
   <script src="js/board.js"></script>
   <script src="js/othello.js"></script>
   <script src="js/gametree.js"></script>
+  <script src="js/mcts.js"></script>
   <script src="cpp/mcts_wasm.js"></script>
   <script src="js/mcts_wasm.js"></script>
   <script src="js/mcts_old.js"></script>

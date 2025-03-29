@@ -1,6 +1,6 @@
 // AI: Monte Carlo Tree Search {{{1
 
-function makeMonteCarloTreeSearchBasedAI(options) {
+function makeMonteCarloTreeSearchBasedAIJs(options) {
   return {
     findTheBestMove: function (gameTree) {
       return tryMonteCarloTreeSearch(gameTree, options.level);
@@ -125,5 +125,3 @@ Node.prototype.update = function (won) {
   this.wins += won;
   this.visits += 1;
 };
-
-
