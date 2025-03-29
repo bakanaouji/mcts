@@ -3,8 +3,8 @@
 
 #include <vector>
 #include <memory>
-#include "GameState.hpp"
-#include "Move.hpp"
+#include "gamestate.hpp"
+#include "move.hpp"
 
 class Node {
 public:

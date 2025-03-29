@@ -1,4 +1,4 @@
-#include "Node.hpp"
+#include "node.hpp"
 #include "mcts.hpp"
 #include <algorithm>
 #include <random>

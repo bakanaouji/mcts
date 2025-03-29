@@ -5,9 +5,9 @@
 #include <random>
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
-#include "GameState.hpp"
-#include "Move.hpp"
-#include "Node.hpp"
+#include "gamestate.hpp"
+#include "move.hpp"
+#include "node.hpp"
 
 class MCTS {
 public:
