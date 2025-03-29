@@ -4,9 +4,9 @@
 #include <random>
 #include <cmath>
 
-Node::Node(const GameState& s, Node* p, const Move& m)
-    : state(s), parent(p), move(m), wins(0), visits(0) {
-    untriedMoves = MCTS().getLegalMoves(state);
+Node::Node(const GameTree& gt, Node* p, const Move& m)
+    : gameTree(gt), parent(p), move(m), wins(0), visits(0) {
+    untriedMoves = gameTree.moves;
 }
 
 Node* Node::selectChild() {
@@ -29,30 +29,66 @@ Node* Node::expandChild() {
     Move move = untriedMoves[moveIndex];
     untriedMoves.erase(untriedMoves.begin() + moveIndex);
     
-    GameState nextState = MCTS().makeMove(state, move);
-    auto newNode = std::make_unique<Node>(nextState, this, move);
+    GameState nextState = gameTree.state;
+    nextState.currentPlayer = nextState.currentPlayer == BLACK ? WHITE : BLACK;
+    nextState.wasPassed = false;
+    
+    if (!move.isPass) {
+        int idx = move.y * BOARD_SIZE + move.x;
+        nextState.board[idx] = gameTree.state.currentPlayer;
+        
+        std::vector<int> flippable = GameTree::getFlippableDiscs(gameTree.state, move.x, move.y);
+        for (int flipIdx : flippable) {
+            nextState.board[flipIdx] = gameTree.state.currentPlayer;
+        }
+    } else {
+        nextState.wasPassed = true;
+    }
+    
+    GameTree nextTree(nextState);
+    auto newNode = std::make_unique<Node>(nextTree, this, move);
     Node* nodePtr = newNode.get();
     children.push_back(std::move(newNode));
     return nodePtr;
 }
 
 double Node::simulate() {
-    GameState currentState = state;
-    MCTS mcts;
+    GameState currentState = gameTree.state;
     
     while (true) {
-        auto moves = mcts.getLegalMoves(currentState);
-        if (moves.empty()) break;
+        GameTree currentTree(currentState);
+        if (currentTree.moves.empty()) break;
         
         static std::random_device rd;
         static std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(0, moves.size() - 1);
-        Move randomMove = moves[dis(gen)];
-        currentState = mcts.makeMove(currentState, randomMove);
+        std::uniform_int_distribution<> dis(0, currentTree.moves.size() - 1);
+        Move randomMove = currentTree.moves[dis(gen)];
+        
+        if (randomMove.isPass) {
+            currentState.currentPlayer = currentState.currentPlayer == BLACK ? WHITE : BLACK;
+            currentState.wasPassed = true;
+        } else {
+            int idx = randomMove.y * BOARD_SIZE + randomMove.x;
+            currentState.board[idx] = currentState.currentPlayer;
+            
+            std::vector<int> flippable = GameTree::getFlippableDiscs(currentState, randomMove.x, randomMove.y);
+            for (int flipIdx : flippable) {
+                currentState.board[flipIdx] = currentState.currentPlayer;
+            }
+            
+            currentState.currentPlayer = currentState.currentPlayer == BLACK ? WHITE : BLACK;
+            currentState.wasPassed = false;
+        }
     }
     
-    int result = mcts.evaluateBoard(currentState.board);
-    return state.currentPlayer == BLACK ? (result + 1) / 2.0 : (1 - result) / 2.0;
+    int blackCount = 0, whiteCount = 0;
+    for (int cell : currentState.board) {
+        if (cell == BLACK) blackCount++;
+        else if (cell == WHITE) whiteCount++;
+    }
+    
+    int result = blackCount > whiteCount ? 1 : (blackCount < whiteCount ? -1 : 0);
+    return gameTree.state.currentPlayer == BLACK ? (result + 1) / 2.0 : (1 - result) / 2.0;
 }
 
 void Node::backpropagate(double result) {
@@ -67,7 +103,7 @@ void Node::backpropagate(double result) {
 double Node::calculateUCB(int totalVisits) const {
     if (visits == 0) return std::numeric_limits<double>::infinity();
     
-    bool isRootPlayer = (state.rootPlayer == state.currentPlayer);
+    bool isRootPlayer = (gameTree.state.rootPlayer == gameTree.state.currentPlayer);
     double exploitation = isRootPlayer ? 
         static_cast<double>(wins) / visits :
         static_cast<double>(visits - wins) / visits;

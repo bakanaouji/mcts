@@ -5,22 +5,16 @@
 #include <random>
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
-#include "gamestate.hpp"
-#include "move.hpp"
+#include "gametree.hpp"
 #include "node.hpp"
 
 class MCTS {
 public:
     MCTS(int iterations = 1000);
     Move findBestMove(const emscripten::val& jsBoard, int player, bool wasPassed);
-    std::vector<Move> getLegalMoves(const GameState& state) const;
-    std::vector<int> getFlippableDiscs(const GameState& state, int x, int y) const;
-    GameState makeMove(const GameState& state, const Move& move) const;
-    int evaluateBoard(const std::vector<int>& board) const;
     
 private:
     int maxIterations;
-    std::mt19937 rng;
 };
 
 #endif // MCTS_HPP

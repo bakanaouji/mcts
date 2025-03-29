@@ -3,12 +3,11 @@
 
 #include <vector>
 #include <memory>
-#include "gamestate.hpp"
-#include "move.hpp"
+#include "gametree.hpp"
 
 class Node {
 public:
-    GameState state;
+    GameTree gameTree;
     std::vector<Move> untriedMoves;
     std::vector<std::unique_ptr<Node>> children;
     Node* parent;
@@ -16,7 +15,7 @@ public:
     int wins;
     int visits;
     
-    Node(const GameState& s, Node* p = nullptr, const Move& m = Move());
+    Node(const GameTree& gt, Node* p = nullptr, const Move& m = Move());
     Node* selectChild();
     Node* expandChild();
     double simulate();
