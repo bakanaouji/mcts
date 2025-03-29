@@ -37,7 +37,7 @@ Node* Node::expandChild() {
         int idx = move.y * BOARD_SIZE + move.x;
         nextState.board[idx] = gameTree.state.currentPlayer;
         
-        std::vector<int> flippable = GameTree::getFlippableDiscs(gameTree.state, move.x, move.y);
+        std::vector<int> flippable = GameTree::turnableCellList(gameTree.state, move.x, move.y);
         for (int flipIdx : flippable) {
             nextState.board[flipIdx] = gameTree.state.currentPlayer;
         }
@@ -71,7 +71,7 @@ double Node::simulate() {
             int idx = randomMove.y * BOARD_SIZE + randomMove.x;
             currentState.board[idx] = currentState.currentPlayer;
             
-            std::vector<int> flippable = GameTree::getFlippableDiscs(currentState, randomMove.x, randomMove.y);
+            std::vector<int> flippable = GameTree::turnableCellList(currentState, randomMove.x, randomMove.y);
             for (int flipIdx : flippable) {
                 currentState.board[flipIdx] = currentState.currentPlayer;
             }

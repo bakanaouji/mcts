@@ -12,7 +12,11 @@ public:
     
     GameTree(const GameState& s);
     static std::vector<Move> possibleMoveList(const GameState& state);
-    static std::vector<int> getFlippableDiscs(const GameState& state, int x, int y);
+    static std::vector<Move> completePassingMove(const std::vector<Move>& attackingMoves, const GameState& state);
+    static std::vector<int> turnableCellList(const GameState& state, int x, int y);
+    static bool canAttack(const std::vector<int>& turnableCells);
+    static int nextPlayer(int player);
+    static GameState makeNextState(const GameState& state, int x, int y, const std::vector<int>& turnableCells);
 };
 
 #endif // GAMETREE_HPP

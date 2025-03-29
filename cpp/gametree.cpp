@@ -7,76 +7,97 @@ GameTree::GameTree(const GameState& s) : state(s) {
 std::vector<Move> GameTree::possibleMoveList(const GameState& state) {
     std::vector<Move> moves;
     
+    // 石を置くことができる行動を列挙していく
     for (int y = 0; y < BOARD_SIZE; y++) {
         for (int x = 0; x < BOARD_SIZE; x++) {
-            std::vector<int> flippable;
-            if (state.board[y * BOARD_SIZE + x] != EMPTY) continue;
-            
-            int opponent = state.currentPlayer == BLACK ? WHITE : BLACK;
-            const int dx[] = {-1, -1, -1, 0, 0, 1, 1, 1};
-            const int dy[] = {-1, 0, 1, -1, 1, -1, 0, 1};
-            
-            for (int dir = 0; dir < 8; dir++) {
-                std::vector<int> temp;
-                int nx = x + dx[dir];
-                int ny = y + dy[dir];
-                
-                while (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE) {
-                    int idx = ny * BOARD_SIZE + nx;
-                    if (state.board[idx] == opponent) {
-                        temp.push_back(idx);
-                    } else if (state.board[idx] == state.currentPlayer && !temp.empty()) {
-                        flippable.insert(flippable.end(), temp.begin(), temp.end());
-                        break;
-                    } else {
-                        break;
-                    }
-                    nx += dx[dir];
-                    ny += dy[dir];
-                }
-            }
-            
-            if (!flippable.empty()) {
+            auto turnableCells = turnableCellList(state, x, y);
+            if (canAttack(turnableCells)) {
                 moves.emplace_back(x, y);
             }
         }
     }
     
-    if (moves.empty() && !state.wasPassed) {
-        moves.emplace_back(-1, -1, true);
-    }
-    
-    return moves;
+    // 必要であればパスする手も加えて返す
+    return completePassingMove(moves, state);
 }
 
-std::vector<int> GameTree::getFlippableDiscs(const GameState& state, int x, int y) {
-    if (state.board[y * BOARD_SIZE + x] != EMPTY) return {};
+std::vector<Move> GameTree::completePassingMove(const std::vector<Move>& attackingMoves, const GameState& state) {
+    // どこかしらに石を置けるならそのまま返す
+    if (!attackingMoves.empty()) {
+        return attackingMoves;
+    }
+    // 前に相手がパスしてなかったら，パスできる
+    else if (!state.wasPassed) {
+        return { Move(-1, -1, true) };
+    }
+    // 前に相手がパスしていたら，ゲーム終了
+    else {
+        return {};
+    }
+}
+
+bool GameTree::canAttack(const std::vector<int>& turnableCells) {
+    return !turnableCells.empty();
+}
+
+int GameTree::nextPlayer(int player) {
+    return player == BLACK ? WHITE : BLACK;
+}
+
+GameState GameTree::makeNextState(const GameState& state, int x, int y, const std::vector<int>& turnableCells) {
+    GameState newState = state;
+    newState.board[y * BOARD_SIZE + x] = state.currentPlayer;
+    // ひっくり返せる石をすべてひっくり返す
+    for (int idx : turnableCells) {
+        newState.board[idx] = state.currentPlayer;
+    }
+    newState.currentPlayer = nextPlayer(state.currentPlayer);
+    newState.wasPassed = false;
+    return newState;
+}
+
+std::vector<int> GameTree::turnableCellList(const GameState& state, int x, int y) {
+    std::vector<int> turnableCells;
     
-    std::vector<int> flippable;
-    int opponent = state.currentPlayer == BLACK ? WHITE : BLACK;
+    // すでに石が置いてあったら置くことはできないので，どこもひっくり返せない
+    if (state.board[y * BOARD_SIZE + x] != EMPTY) {
+        return turnableCells;
+    }
     
-    const int dx[] = {-1, -1, -1, 0, 0, 1, 1, 1};
-    const int dy[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+    int opponent = nextPlayer(state.currentPlayer);
     
-    for (int dir = 0; dir < 8; dir++) {
-        std::vector<int> temp;
-        int nx = x + dx[dir];
-        int ny = y + dy[dir];
-        
-        while (nx >= 0 && nx < BOARD_SIZE && ny >= 0 && ny < BOARD_SIZE) {
-            int idx = ny * BOARD_SIZE + nx;
-            if (state.board[idx] == opponent) {
-                temp.push_back(idx);
-            } else if (state.board[idx] == state.currentPlayer && !temp.empty()) {
-                flippable.insert(flippable.end(), temp.begin(), temp.end());
-                break;
-            } else {
-                break;
+    for (int dx = -1; dx <= 1; dx++) {
+        for (int dy = -1; dy <= 1; dy++) {
+            // 石を置く位置はチェックする必要なし
+            if (dx == 0 && dy == 0) {
+                continue;
             }
-            nx += dx[dir];
-            ny += dy[dir];
+            // 上下左右斜め方向に自分の石が存在していたら，
+            // その間にある石をひっくり返せる
+            for (int i = 1; i < BOARD_SIZE; i++) {
+                int nx = x + i * dx;
+                int ny = y + i * dy;
+                
+                // 盤面からはみ出ていたらチェックできない
+                if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE) {
+                    break;
+                }
+                
+                const int idx = ny * BOARD_SIZE + nx;
+                // 自分の石が存在していたら，その間にある石をひっくり返せる
+                if (state.board[idx] == state.currentPlayer && i >= 2) {
+                    for (int j = 1; j < i; j++) {
+                        turnableCells.push_back((y + j * dy) * BOARD_SIZE + (x + j * dx));
+                    }
+                    break;
+                }
+                // 相手の石が存在していなかったら，チェックできない
+                if (state.board[idx] != opponent) {
+                    break;
+                }
+            }
         }
     }
     
-    return flippable;
+    return turnableCells;
 }
