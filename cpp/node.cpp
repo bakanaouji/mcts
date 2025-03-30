@@ -1,7 +1,7 @@
 #include "node.hpp"
 #include "mcts.hpp"
 #include <algorithm>
-#include <random>
+#include "fixed_random.hpp"
 #include <cmath>
 
 Node::Node(const GameTree& gt, Node* p, const Move& m)
@@ -38,13 +38,9 @@ Node* Node::selectChild(int rootPlayer, int nodePlayer) {
 }
 
 Node* Node::expandChild() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    
     if (untriedMoves.empty()) return nullptr;
     
-    std::uniform_int_distribution<> dis(0, untriedMoves.size() - 1);
-    int moveIndex = dis(gen);
+    int moveIndex = FixedRandom::getNext(untriedMoves.size());
     Move move = untriedMoves[moveIndex];
     untriedMoves.erase(untriedMoves.begin() + moveIndex);
     
@@ -63,10 +59,8 @@ double Node::simulate(int rootPlayer) {
         GameTree currentTree(currentState);
         if (currentTree.moves.empty()) break;
         
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(0, currentTree.moves.size() - 1);
-        Move randomMove = currentTree.moves[dis(gen)];
+        int moveIndex = FixedRandom::getNext(currentTree.moves.size());
+        Move randomMove = currentTree.moves[moveIndex];
         
         // Force the game tree promise to get the next state
         std::shared_ptr<GameTree> nextTree = randomMove.nextGameTreePromise();

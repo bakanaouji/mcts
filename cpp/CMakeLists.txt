@@ -10,8 +10,16 @@ set(EMSCRIPTEN_FLAGS "-s WASM=1 -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s
 
 # Add Emscripten include directory
 include_directories($ENV{EMSDK}/upstream/emscripten/system/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(mcts_wasm mcts.cpp node.cpp gametree.cpp)
+# Add source files
+set(SOURCES
+    mcts.cpp
+    node.cpp
+    gametree.cpp
+)
+
+add_executable(mcts_wasm ${SOURCES})
 set_target_properties(mcts_wasm PROPERTIES 
     COMPILE_FLAGS "${EMSCRIPTEN_FLAGS}"
     LINK_FLAGS "${EMSCRIPTEN_FLAGS} -lembind")

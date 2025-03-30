@@ -5,13 +5,16 @@
 
 MCTS::MCTS(int iterations) : maxIterations(iterations) {}
 
-Move MCTS::findBestMove(const emscripten::val& jsBoard, int player, bool wasPassed) {
+Move MCTS::findBestMove(const emscripten::val& jsBoard, int jsPlayer, bool wasPassed) {
     std::vector<int> board;
     int length = jsBoard["length"].as<int>();
     for (int i = 0; i < length; i++) {
         std::string cellValue = jsBoard[i].as<std::string>();
         board.push_back(cellValue == "black" ? BLACK : (cellValue == "white" ? WHITE : EMPTY));
     }
+
+    // Convert JavaScript player (-1/1) to C++ player (1/2)
+    int player = jsPlayer == 1 ? BLACK : WHITE;
     
     GameState rootState(board, player, wasPassed, player);
     GameTree rootTree(rootState);

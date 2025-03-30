@@ -1,3 +1,9 @@
+// Game constants
+const N = 8;  // Board size
+const BLACK = 1;
+const WHITE = -1;
+const EMPTY = 0;
+
 /**
  * グリッド座標をインデックスへ変換
  */
@@ -33,4 +39,19 @@ function force(promise) {
  */
 function random(n) {
   return Math.floor(Math.random() * n);
+}
+
+/**
+ * 勝敗を判定
+ */
+function judge(board) {
+  let blackCount = 0;
+  let whiteCount = 0;
+  
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === "black") blackCount++;
+    else if (board[i] === "white") whiteCount++;
+  }
+  
+  return blackCount > whiteCount ? 1 : (blackCount < whiteCount ? -1 : 0);
 }
