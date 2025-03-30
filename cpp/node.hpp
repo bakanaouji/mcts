@@ -12,17 +12,15 @@ public:
     std::vector<std::unique_ptr<Node>> children;
     Node* parent;
     Move move;
-    int wins;
+    double wins;
     int visits;
     
     Node(const GameTree& gt, Node* p = nullptr, const Move& m = Move());
-    Node* selectChild();
+    Node* selectChild(int rootPlayer, int nodePlayer);
     Node* expandChild();
-    double simulate();
+    double simulate(int rootPlayer);
     void backpropagate(double result);
-    
-private:
-    double calculateUCB(int totalVisits) const;
+    void update(double result);
 };
 
 #endif // NODE_HPP

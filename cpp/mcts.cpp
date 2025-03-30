@@ -3,7 +3,6 @@
 #include <ctime>
 #include <random>
 
-
 MCTS::MCTS(int iterations) : maxIterations(iterations) {}
 
 Move MCTS::findBestMove(const emscripten::val& jsBoard, int player, bool wasPassed) {
@@ -21,30 +20,38 @@ Move MCTS::findBestMove(const emscripten::val& jsBoard, int player, bool wasPass
     for (int i = 0; i < maxIterations; i++) {
         Node* node = &rootNode;
         
-        // Selection
+        // Selection - Match JavaScript version exactly
         while (node->untriedMoves.empty() && !node->children.empty()) {
-            node = node->selectChild();
-        }
-        
-        // Expansion
-        if (!node->untriedMoves.empty() && node->visits >= 40) {
-            node = node->expandChild();
+            node = node->selectChild(player, node->gameTree.state.currentPlayer);
         }
         
         // Simulation
-        double result = node->simulate();
+        double result = node->simulate(player);
         
         // Backpropagation
         node->backpropagate(result);
+        
+        // Node expansion strategy - Expand all untried moves when visits >= 40
+        // This is a key difference in the JavaScript version
+        if (node->visits >= 40) {
+            while (!node->untriedMoves.empty()) {
+                node->expandChild();
+            }
+        }
     }
     
     // Select best move based on visit count
-    auto it = std::max_element(rootNode.children.begin(), rootNode.children.end(),
-        [](const std::unique_ptr<Node>& a, const std::unique_ptr<Node>& b) {
-            return a->visits < b->visits;
-        });
+    Node* bestChild = nullptr;
+    int maxVisits = -1;
     
-    return it != rootNode.children.end() ? (*it)->move : Move(-1, -1, true);
+    for (const auto& child : rootNode.children) {
+        if (child->visits > maxVisits) {
+            maxVisits = child->visits;
+            bestChild = child.get();
+        }
+    }
+    
+    return bestChild ? bestChild->move : Move(-1, -1, true);
 }
 
 EMSCRIPTEN_BINDINGS(mcts_module) {

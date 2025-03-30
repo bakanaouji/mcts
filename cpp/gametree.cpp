@@ -1,4 +1,5 @@
 #include "gametree.hpp"
+#include <memory>
 
 GameTree::GameTree(const GameState& s) : state(s) {
     moves = possibleMoveList(state);
@@ -12,12 +13,17 @@ std::vector<Move> GameTree::possibleMoveList(const GameState& state) {
         for (int x = 0; x < BOARD_SIZE; x++) {
             auto turnableCells = turnableCellList(state, x, y);
             if (canAttack(turnableCells)) {
-                moves.emplace_back(x, y, turnableCells);
+                auto currentX = x;
+                auto currentY = y;
+                auto currentCells = turnableCells;
+                auto promise = delay([state, currentX, currentY, currentCells]() {
+                    return makeNextGameTree(state, currentX, currentY, currentCells);
+                });
+                moves.emplace_back(currentX, currentY, currentCells, promise);
             }
         }
     }
     
-    // 必要であればパスする手も加えて返す
     return completePassingMove(moves, state);
 }
 
@@ -28,7 +34,10 @@ std::vector<Move> GameTree::completePassingMove(const std::vector<Move>& attacki
     }
     // 前に相手がパスしてなかったら，パスできる
     else if (!state.wasPassed) {
-        return { Move(-1, -1, true) };
+        auto promise = delay([state]() {
+            return makePassGameTree(state);
+        });
+        return { Move(-1, -1, std::vector<int>(), promise, true) };
     }
     // 前に相手がパスしていたら，ゲーム終了
     else {
@@ -42,6 +51,22 @@ bool GameTree::canAttack(const std::vector<int>& turnableCells) {
 
 int GameTree::nextPlayer(int player) {
     return player == BLACK ? WHITE : BLACK;
+}
+
+std::function<std::shared_ptr<GameTree>()> GameTree::delay(std::function<std::shared_ptr<GameTree>()> f) {
+    return f;  // In C++ we don't need actual delay mechanism, just return the function
+}
+
+std::shared_ptr<GameTree> GameTree::makeNextGameTree(const GameState& state, int x, int y, const std::vector<int>& turnableCells) {
+    GameState nextState = makeNextState(state, x, y, turnableCells);
+    return std::make_shared<GameTree>(nextState);
+}
+
+std::shared_ptr<GameTree> GameTree::makePassGameTree(const GameState& state) {
+    GameState nextState = state;
+    nextState.currentPlayer = nextPlayer(state.currentPlayer);
+    nextState.wasPassed = true;
+    return std::make_shared<GameTree>(nextState);
 }
 
 GameState GameTree::makeNextState(const GameState& state, int x, int y, const std::vector<int>& turnableCells) {

@@ -9,13 +9,32 @@ Node::Node(const GameTree& gt, Node* p, const Move& m)
     untriedMoves = gameTree.moves;
 }
 
-Node* Node::selectChild() {
+Node* Node::selectChild(int rootPlayer, int nodePlayer) {
     int totalVisits = visits;
-    auto it = std::max_element(children.begin(), children.end(),
-        [totalVisits, this](const std::unique_ptr<Node>& a, const std::unique_ptr<Node>& b) {
-            return a->calculateUCB(totalVisits) < b->calculateUCB(totalVisits);
-        });
-    return it->get();
+    double maxValue = -std::numeric_limits<double>::infinity();
+    Node* selectedChild = nullptr;
+
+    for (const auto& child : children) {
+        double value;
+        if (child->visits == 0) {
+            value = 1e10;
+        } else {
+            if (rootPlayer == nodePlayer) {
+                value = static_cast<double>(child->wins) / child->visits +
+                       std::sqrt(2.0 * std::log(totalVisits) / child->visits);
+            } else {
+                value = static_cast<double>(child->visits - child->wins) / child->visits +
+                       std::sqrt(2.0 * std::log(totalVisits) / child->visits);
+            }
+        }
+        
+        if (value > maxValue) {
+            maxValue = value;
+            selectedChild = child.get();
+        }
+    }
+    
+    return selectedChild;
 }
 
 Node* Node::expandChild() {
@@ -29,30 +48,15 @@ Node* Node::expandChild() {
     Move move = untriedMoves[moveIndex];
     untriedMoves.erase(untriedMoves.begin() + moveIndex);
     
-    GameState nextState = gameTree.state;
-    nextState.currentPlayer = nextState.currentPlayer == BLACK ? WHITE : BLACK;
-    nextState.wasPassed = false;
-    
-    if (!move.isPass) {
-        int idx = move.y * BOARD_SIZE + move.x;
-        nextState.board[idx] = gameTree.state.currentPlayer;
-        
-        // 保存されたturnableCellsを使用
-        for (int flipIdx : move.turnableCells) {
-            nextState.board[flipIdx] = gameTree.state.currentPlayer;
-        }
-    } else {
-        nextState.wasPassed = true;
-    }
-    
-    GameTree nextTree(nextState);
-    auto newNode = std::make_unique<Node>(nextTree, this, move);
+    // Force the game tree promise to get the next state
+    std::shared_ptr<GameTree> nextTree = move.nextGameTreePromise();
+    auto newNode = std::make_unique<Node>(*nextTree, this, move);
     Node* nodePtr = newNode.get();
     children.push_back(std::move(newNode));
     return nodePtr;
 }
 
-double Node::simulate() {
+double Node::simulate(int rootPlayer) {
     GameState currentState = gameTree.state;
     
     while (true) {
@@ -64,21 +68,9 @@ double Node::simulate() {
         std::uniform_int_distribution<> dis(0, currentTree.moves.size() - 1);
         Move randomMove = currentTree.moves[dis(gen)];
         
-        if (randomMove.isPass) {
-            currentState.currentPlayer = currentState.currentPlayer == BLACK ? WHITE : BLACK;
-            currentState.wasPassed = true;
-        } else {
-            int idx = randomMove.y * BOARD_SIZE + randomMove.x;
-            currentState.board[idx] = currentState.currentPlayer;
-            
-            // 保存されたturnableCellsを使用
-            for (int flipIdx : randomMove.turnableCells) {
-                currentState.board[flipIdx] = currentState.currentPlayer;
-            }
-            
-            currentState.currentPlayer = currentState.currentPlayer == BLACK ? WHITE : BLACK;
-            currentState.wasPassed = false;
-        }
+        // Force the game tree promise to get the next state
+        std::shared_ptr<GameTree> nextTree = randomMove.nextGameTreePromise();
+        currentState = nextTree->state;
     }
     
     int blackCount = 0, whiteCount = 0;
@@ -87,27 +79,19 @@ double Node::simulate() {
         else if (cell == WHITE) whiteCount++;
     }
     
-    int result = blackCount > whiteCount ? 1 : (blackCount < whiteCount ? -1 : 0);
-    return gameTree.state.currentPlayer == BLACK ? (result + 1) / 2.0 : (1 - result) / 2.0;
+    int judge = blackCount > whiteCount ? 1 : (blackCount < whiteCount ? -1 : 0);
+    return (judge * (rootPlayer == BLACK ? 1 : -1)) / 2.0 + 0.5;
 }
 
 void Node::backpropagate(double result) {
     Node* current = this;
     while (current != nullptr) {
-        current->visits++;
-        current->wins += result;
+        current->update(result);
         current = current->parent;
     }
 }
 
-double Node::calculateUCB(int totalVisits) const {
-    if (visits == 0) return std::numeric_limits<double>::infinity();
-    
-    bool isRootPlayer = (gameTree.state.rootPlayer == gameTree.state.currentPlayer);
-    double exploitation = isRootPlayer ? 
-        static_cast<double>(wins) / visits :
-        static_cast<double>(visits - wins) / visits;
-    
-    double exploration = std::sqrt(2.0 * std::log(totalVisits) / visits);
-    return exploitation + exploration;
+void Node::update(double result) {
+    wins += result;
+    visits += 1;
 }
