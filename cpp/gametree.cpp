@@ -12,7 +12,7 @@ std::vector<Move> GameTree::possibleMoveList(const GameState& state) {
         for (int x = 0; x < BOARD_SIZE; x++) {
             auto turnableCells = turnableCellList(state, x, y);
             if (canAttack(turnableCells)) {
-                moves.emplace_back(x, y);
+                moves.emplace_back(x, y, turnableCells);
             }
         }
     }
