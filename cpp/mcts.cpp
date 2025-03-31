@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <ctime>
 #include <random>
+#include <utility>
 
 MCTS::MCTS(int iterations) : maxIterations(iterations) {}
 
@@ -36,7 +37,7 @@ Move MCTS::findBestMove(const emscripten::val& jsBoard, int jsPlayer, bool wasPa
         
         // Node expansion strategy - Expand all untried moves when visits >= 40
         // This is a key difference in the JavaScript version
-        if (node->visits >= 40) {
+        if (node->visits >= std::min(40, maxIterations)) {
             while (!node->untriedMoves.empty()) {
                 node->expandChild();
             }
