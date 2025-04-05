@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(mcts_wasm)
+project(uct_wasm)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -14,12 +14,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Add source files
 set(SOURCES
-    mcts.cpp
-    node.cpp
-    gametree.cpp
+    uct.cpp
+    gamenode.cpp
 )
 
-add_executable(mcts_wasm ${SOURCES})
-set_target_properties(mcts_wasm PROPERTIES 
+add_executable(uct_wasm ${SOURCES})
+set_target_properties(uct_wasm PROPERTIES 
     COMPILE_FLAGS "${EMSCRIPTEN_FLAGS}"
     LINK_FLAGS "${EMSCRIPTEN_FLAGS} -lembind")

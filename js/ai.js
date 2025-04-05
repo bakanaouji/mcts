@@ -1,6 +1,6 @@
 var aiMakers = {
   mcts_js: makeMonteCarloTreeSearchBasedAIJs,
-  mcts_wasm: makeMonteCarloTreeSearchBasedAI,
+  uct_wasm: makeUCTBasedAI,
   mcts_old: makeMonteCarloTreeSearchBasedAIOld,
   pmc: makePrimitiveMonteCarloBasedAI
 };
