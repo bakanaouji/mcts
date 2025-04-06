@@ -23,6 +23,10 @@ struct OthelloState {
         possibleActions = enumeratePossibleActions(*this);
     }
 
+    bool operator==(const OthelloState& other) const {
+        return player == other.player && possibleActions == other.possibleActions && board == other.board && wasPassedbyPreviousPlayer == other.wasPassedbyPreviousPlayer;
+    }
+
     static OthelloState makeNextState(OthelloState& state, const int index) {
         OthelloState newState = state;
         const int player = state.player;

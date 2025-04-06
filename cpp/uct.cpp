@@ -15,6 +15,12 @@ Move UCT::findBestAction(const emscripten::val& jsBoard, int jsPlayer, bool wasP
 
     OthelloState rootState(board, player, wasPassed);
     GameNode rootNode(rootState, -1, jsPlayer == 1 ? WHITE : BLACK, false);
+    for (auto& child : mPossibleChidren) {
+        if (child->getState() == rootState) {
+            rootNode = *child;
+            break;
+        }
+    }
 
     for (int i = 0; i < mMaxIterations; ++i) {
         rollout(&rootNode, player);
@@ -32,6 +38,12 @@ Move UCT::findBestAction(const emscripten::val& jsBoard, int jsPlayer, bool wasP
     }
 
     int bestAction = bestChild ? bestChild->getParentEdge() : -1;
+
+    if (!bestChild->isTerminalNode() && bestChild->getChildren().empty()) {
+        bestChild->generateChildren();
+    }
+    mPossibleChidren = bestChild->getChildren();
+
     return bestAction != -1 ? Move(bestAction % BOARD_SIZE, bestAction / BOARD_SIZE, false): Move(-1, -1, true);
 }
 

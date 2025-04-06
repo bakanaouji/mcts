@@ -23,6 +23,7 @@ private:
 
     std::mt19937 mEngine;
     int mMaxIterations;
+    std::vector<std::shared_ptr<GameNode>> mPossibleChidren;
 };
 
 #endif // UCT_HPP
