@@ -1,6 +1,6 @@
 #include "gamenode.hpp"
 
-GameNode::GameNode(OthelloState state, const int parentEdge, bool isTerminal) : mState(state), mParentEdge(parentEdge), mIsTerminal(isTerminal), mN(0), mQ(0.0), mChildren() {
+GameNode::GameNode(OthelloState state, const int parentEdge, const int previousPlayer, bool isTerminal) : mState(state), mParentEdge(parentEdge), mPreviousPlayer(previousPlayer), mIsTerminal(isTerminal), mN(0), mQ(0.0), mChildren() {
 }
 
 void GameNode::generateChildren() {
@@ -34,13 +34,20 @@ double GameNode::reward(const int player) const {
         else if (cell == WHITE) whiteCount++;
     }
     
-    const int winPlayer = blackCount > whiteCount ? 1 : (blackCount < whiteCount ? -1 : 0);
-    return (winPlayer * (player == BLACK ? 1 : -1)) / 2.0 + 0.5;
+    const int winPlayer = blackCount > whiteCount ? 1 : (blackCount < whiteCount ? 2 : 0);
+    if (winPlayer == 0) {
+        return 0; // draw
+    }
+    if (winPlayer == player) {
+        return 0.5; // win
+    }
+    return -0.5; // lose
 }
 
 std::shared_ptr<GameNode> GameNode::makeNextNode(const int action) {
+    const int previousPlayer = mState.player;
     auto newState = OthelloState::makeNextState(mState, action);
     const bool isTerminal = newState.possibleActions.size() == 0;
-    return std::make_shared<GameNode>(newState, action, isTerminal);
+    return std::make_shared<GameNode>(newState, action, previousPlayer, isTerminal);
 }
 

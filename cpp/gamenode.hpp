@@ -6,15 +6,16 @@
 
 class GameNode {
 public:
-    GameNode(OthelloState state, const int parentEdge, const bool isTerminal);
+    GameNode(OthelloState state, const int parentEdge, const int previousPlayer, const bool isTerminal);
     void generateChildren();
     std::shared_ptr<GameNode> getRandomChild(std::mt19937& gen);
     double reward(const int player) const;
     int getN() const { return mN; };
     double getQ() const { return mQ; };
-    std::vector<std::shared_ptr<GameNode>>& getChildren() {return mChildren;}
+    std::vector<std::shared_ptr<GameNode>>& getChildren() { return mChildren; }
     OthelloState& getState() { return mState; }
     int getParentEdge() const { return mParentEdge; }
+    int getPreviousPlayer() const { return mPreviousPlayer; }
     bool isTerminalNode() const { return mIsTerminal; };
     void setN(int n) { mN = n; };
     void setQ(double q) { mQ = q; };
@@ -24,6 +25,7 @@ private:
 
     OthelloState mState;
     int mParentEdge;
+    int mPreviousPlayer;
     bool mIsTerminal;
     int mN;
     double mQ;

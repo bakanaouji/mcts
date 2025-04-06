@@ -18,7 +18,7 @@ private:
     std::vector<GameNode*> selectChild(GameNode* node, const int rootPlayer);
     void expandChild(GameNode* node);
     double simulate(GameNode* node, const int rootPlayer);
-    void backpropagate(std::vector<GameNode*> path, double reward);
+    void backpropagate(std::vector<GameNode*> path, double reward, const int rootPlayer);
     GameNode* selectChildByUCBValues(GameNode* node, const int rootPlayer);
 
     std::mt19937 mEngine;

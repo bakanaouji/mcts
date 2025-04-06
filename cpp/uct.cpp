@@ -11,10 +11,10 @@ Move UCT::findBestAction(const emscripten::val& jsBoard, int jsPlayer, bool wasP
     }
 
     // Convert JavaScript player (-1/1) to C++ player (1/2)
-    int player = jsPlayer == 1 ? BLACK : WHITE;
+    const int player = jsPlayer == 1 ? BLACK : WHITE;
 
     OthelloState rootState(board, player, wasPassed);
-    GameNode rootNode(rootState, -1, false);
+    GameNode rootNode(rootState, -1, jsPlayer == 1 ? WHITE : BLACK, false);
 
     for (int i = 0; i < mMaxIterations; ++i) {
         rollout(&rootNode, player);
@@ -22,10 +22,11 @@ Move UCT::findBestAction(const emscripten::val& jsBoard, int jsPlayer, bool wasP
 
     // Select the child with the maximum visit count
     GameNode* bestChild = nullptr;
-    int maxVisits = -1;
+    double maxValue = -std::numeric_limits<double>::infinity();
     for (auto& child : rootNode.getChildren()) {
-        if (child->getN() > maxVisits) {
-            maxVisits = child->getN();
+        const double childValue = child->getQ() / child->getN();
+        if (childValue > maxValue) {
+            maxValue = childValue;
             bestChild = child.get();
         }
     }
@@ -40,7 +41,7 @@ void UCT::rollout(GameNode* rootNode, const int rootPlayer) {
     auto& leafNode = path.back();
     expandChild(leafNode);
     const double reward = simulate(leafNode, rootPlayer);
-    backpropagate(path, reward);
+    backpropagate(path, reward, rootPlayer);
 }
 
 // Find an unxplored descendent of a given node
@@ -93,11 +94,15 @@ double UCT::simulate(GameNode* node, const int rootPlayer) {
 }
 
 // Backpropagate the result of a simulation up to the root node
-void UCT::backpropagate(std::vector<GameNode*> path, double reward) {
+void UCT::backpropagate(std::vector<GameNode*> path, double reward, const int rootPlayer) {
     for (int i = path.size() - 1; i >= 0; --i) {
         auto& node = path[i];
         node->setN(node->getN() + 1);
-        node->setQ(node->getQ() + reward);
+        if (rootPlayer == node->getPreviousPlayer()) {
+            node->setQ(node->getQ() + reward);
+        } else {
+            node->setQ(node->getQ() - reward);
+        }
     }
 }
 
@@ -112,11 +117,7 @@ GameNode* UCT::selectChildByUCBValues(GameNode* node, const int rootPlayer) {
         if (child->getN() == 0) {
             value = std::numeric_limits<double>::infinity();
         } else {
-            if (rootPlayer == node->getState().player) {
-                value = child->getQ() / child->getN() + std::sqrt(2.0 * logNvertex / child->getN());
-            } else {
-                value = (child->getN() - child->getQ()) / child->getN() + std::sqrt(2.0 * logNvertex / child->getN());
-            }
+            value = child->getQ() / child->getN() + std::sqrt(2 * logNvertex / child->getN());
         }
         if (value > maxValue) {
             maxValue = value;
