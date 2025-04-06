@@ -45,13 +45,37 @@ struct OthelloState {
         return newState;
     }
 
+    static bool hasTurnableCells(const OthelloState& state, int x, int y) {
+        // check if the cell is already occupied
+        if (state.board[y * BOARD_SIZE + x] != EMPTY) {
+            return false;
+        }
+
+        int opponent = state.player == BLACK ? WHITE : BLACK;
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if (dx == 0 && dy == 0) continue;
+                for (int i = 1; i < BOARD_SIZE; i++) {
+                    int nx = x + i * dx;
+                    int ny = y + i * dy;
+                    if (nx < 0 || nx >= BOARD_SIZE || ny < 0 || ny >= BOARD_SIZE) break;
+                    const int idx = ny * BOARD_SIZE + nx;
+                    if (state.board[idx] == state.player && i >= 2) {
+                        return true;  // Found at least one turnable cell
+                    }
+                    if (state.board[idx] != opponent) break;
+                }
+            }
+        }
+        return false;
+    }
+
     static std::vector<int> enumeratePossibleActions(const OthelloState& state) {
         std::vector<int> possibleMoves;
         for (int y = 0; y < BOARD_SIZE; y++) {
             for (int x = 0; x < BOARD_SIZE; x++) {
                 const int idx = y * BOARD_SIZE + x;
-                auto turnableCells = turnableCellList(state, x, y);
-                if (!turnableCells.empty()) {
+                if (hasTurnableCells(state, x, y)) {
                     possibleMoves.push_back(idx);
                 }
             }
