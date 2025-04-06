@@ -13,14 +13,13 @@ struct OthelloState {
     int player;
     std::vector<int> possibleActions;
     bool wasPassedbyPreviousPlayer;
-    int rootPlayer;
 
-    OthelloState(const OthelloState& other): board(other.board.size()), player(other.player), possibleActions(other.possibleActions.size()), wasPassedbyPreviousPlayer(other.wasPassedbyPreviousPlayer), rootPlayer(other.rootPlayer) {
+    OthelloState(const OthelloState& other): board(other.board.size()), player(other.player), possibleActions(other.possibleActions.size()), wasPassedbyPreviousPlayer(other.wasPassedbyPreviousPlayer) {
         std::copy(other.board.begin(), other.board.end(), board.begin());
         std::copy(other.possibleActions.begin(), other.possibleActions.end(), possibleActions.begin());
     }
 
-    OthelloState(const std::vector<int>& b, int player, bool passed, int root) : board(b), player(player), wasPassedbyPreviousPlayer(passed), rootPlayer(root) {
+    OthelloState(const std::vector<int>& b, int player, bool passed) : board(b), player(player), wasPassedbyPreviousPlayer(passed) {
         possibleActions = enumeratePossibleActions(*this);
     }
 

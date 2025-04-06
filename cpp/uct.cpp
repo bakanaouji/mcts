@@ -13,7 +13,7 @@ Move UCT::findBestAction(const emscripten::val& jsBoard, int jsPlayer, bool wasP
     // Convert JavaScript player (-1/1) to C++ player (1/2)
     int player = jsPlayer == 1 ? BLACK : WHITE;
 
-    OthelloState rootState(board, player, wasPassed, player);
+    OthelloState rootState(board, player, wasPassed);
     GameNode rootNode(rootState, -1, false);
 
     for (int i = 0; i < mMaxIterations; ++i) {
