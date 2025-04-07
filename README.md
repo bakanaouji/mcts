@@ -21,8 +21,11 @@ This is an Othello/Reversi game implementation with a Monte Carlo Tree Search (M
 
 ## Running the Game
 
-1. Serve the project directory using a local web server
-2. Open index.html in your browser
+1. To play against the C++ version (MCTS_WASM), first start a local server:
+   ```bash
+   python -m http.server
+   ```
+2. Open http://localhost:8000 in your browser
 3. Select player types (Human, MCTS_WASM_1024, or MCTS_WASM_4096)
 4. Click "Start a new game"
 
