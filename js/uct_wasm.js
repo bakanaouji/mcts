@@ -33,12 +33,7 @@ async function makeUCTBasedAI(options) {
             
             if (move.isPass) {
                 return {
-                    isPassingMove: true,
-                    gameTreePromise: delay(() => makeGameTree(
-                        gameTree.board,
-                        nextPlayer(gameTree.player),
-                        true
-                    ))
+                    isPassingMove: true
                 };
             } else {
                 const turnableCells = turnableCellList(
@@ -50,18 +45,7 @@ async function makeUCTBasedAI(options) {
                 
                 return {
                     x: move.x,
-                    y: move.y,
-                    gameTreePromise: delay(() => makeGameTree(
-                        makeNextBoard(
-                            gameTree.board,
-                            move.x,
-                            move.y,
-                            turnableCells,
-                            gameTree.player
-                        ),
-                        nextPlayer(gameTree.player),
-                        false
-                    ))
+                    y: move.y
                 };
             }
         }

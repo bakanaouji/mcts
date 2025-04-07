@@ -8,6 +8,35 @@
   opacity: 0.5;
 }
 
+#stone-counts {
+  margin: 1em auto;
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+}
+
+.stone-count {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.stone-icon {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border-radius: 50%;
+}
+
+.stone-icon.black {
+  background: #000;
+}
+
+.stone-icon.white {
+  background: #fff;
+  border: 1px solid #ccc;
+}
+
 #message
 {
   margin-top: 1em;

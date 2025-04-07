@@ -1,7 +1,6 @@
 var aiMakers = {
   mcts_js: makeMonteCarloTreeSearchBasedAIJs,
   uct_wasm: makeUCTBasedAI,
-  mcts_old: makeMonteCarloTreeSearchBasedAIOld,
   pmc: makePrimitiveMonteCarloBasedAI
 };
 
@@ -20,10 +19,19 @@ async function makeAI(playerType) {
  * AIによって手を選択して進める
  */
 async function selectMoveByAI(gameTree, ai) {
+  // Draw current state first and wait for a short time to ensure UI update
+  drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
   $('#message').text('Now thinking...');
   const start = Date.now();
   const move = ai.findTheBestMove(gameTree);
-  const newGameTree = await force(move.gameTreePromise);
+  const nextBoard = move.isPassingMove ? 
+    gameTree.board : 
+    makeNextBoard(gameTree.board, move.x, move.y, 
+      turnableCellList(gameTree.board, move.x, move.y, gameTree.player), 
+      gameTree.player);
+  const newGameTree = makeGameTree(nextBoard, nextPlayer(gameTree.player), move.isPassingMove);
   const end = Date.now();
   const delta = end - start;
   console.log(delta);

@@ -15,6 +15,16 @@
     <div id="current-player">Current player:
       <span id="current-player-name">-</span>
     </div>
+    <div id="stone-counts">
+      <div id="black-count" class="stone-count">
+        <span class="stone-icon black"></span>
+        Black: <span class="count">2</span>
+      </div>
+      <div id="white-count" class="stone-count">
+        <span class="stone-icon white"></span>
+        White: <span class="count">2</span>
+      </div>
+    </div>
     <div id="message"></div>
     <div id="console"></div>
     <div id="preference-pane">
@@ -28,7 +38,6 @@
             <option value="uct_wasm-1024">MCTS_WASM_1024</option>
             <option value="uct_wasm-4096">MCTS_WASM_4096</option>
             <option value="uct_wasm-40960">MCTS_WASM_40960</option>
-            <option value="mcts_old-1024">MCTS_OLD_AI</option>
           </select>
         </label>
         <label>
@@ -40,7 +49,6 @@
             <option value="uct_wasm-1024">MCTS_WASM_1024</option>
             <option value="uct_wasm-4096">MCTS_WASM_4096</option>
             <option value="uct_wasm-40960">MCTS_WASM_40960</option>
-            <option value="mcts_old-1024">MCTS_OLD_AI</option>
           </select>
         </label>
       </div>
@@ -58,7 +66,6 @@
   <script src="js/mcts.js"></script>
   <script src="cpp/uct_wasm.js"></script>
   <script src="js/uct_wasm.js"></script>
-  <script src="js/mcts_old.js"></script>
   <script src="js/pmc.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/ai.js"></script>

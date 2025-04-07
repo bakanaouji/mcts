@@ -11,11 +11,30 @@ function makeLabelForMove(move) {
 }
 
 /**
+ * 石の数を更新
+ */
+function updateStoneCounts(board) {
+  let blackCount = 0;
+  let whiteCount = 0;
+  
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 8; x++) {
+      if (board[ix(x, y)] === BLACK) blackCount++;
+      else if (board[ix(x, y)] === WHITE) whiteCount++;
+    }
+  }
+  
+  $('#black-count .count').text(blackCount);
+  $('#white-count .count').text(whiteCount);
+}
+
+/**
  * UIをリセット
  */
 function resetUI() {
   $('#console').empty();
   $('#message').empty();
+  updateStoneCounts(makeInitialGameBoard());
 }
 
 /**
@@ -23,6 +42,7 @@ function resetUI() {
  */
 function setupUIToSelectMove(gameTree) {
   $('#message').text('Select your move.');
+  updateStoneCounts(gameTree.board);
   gameTree.moves.forEach(function (m, i) {
     if (m.isPassingMove) {
       $('#console').append(
@@ -60,4 +80,5 @@ function showWinner(board) {
       'The game ends in a draw.' :
       'The winner is ' + (r === 1 ? BLACK : WHITE) + '.'
   );
+  updateStoneCounts(board);
 }
