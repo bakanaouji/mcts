@@ -19,6 +19,8 @@ function shiftToNewGameTree(gameTree) {
   drawGameBoard(gameTree.board, gameTree.player, gameTree.moves);
   // UIを初期化
   resetUI();
+  // 石の数を更新
+  updateStoneCounts(gameTree.board);
   // ゲームが終了していたら，勝者を表示
   if (gameTree.moves.length === 0) {
     showWinner(gameTree.board);

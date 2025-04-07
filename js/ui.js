@@ -34,7 +34,6 @@ function updateStoneCounts(board) {
 function resetUI() {
   $('#console').empty();
   $('#message').empty();
-  updateStoneCounts(makeInitialGameBoard());
 }
 
 /**
