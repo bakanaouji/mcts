@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(mcts_wasm)
+project(uct_wasm)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,8 +10,15 @@ set(EMSCRIPTEN_FLAGS "-s WASM=1 -s EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s
 
 # Add Emscripten include directory
 include_directories($ENV{EMSDK}/upstream/emscripten/system/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(mcts_wasm mcts.cpp node.cpp gametree.cpp)
-set_target_properties(mcts_wasm PROPERTIES 
+# Add source files
+set(SOURCES
+    uct.cpp
+    gamenode.cpp
+)
+
+add_executable(uct_wasm ${SOURCES})
+set_target_properties(uct_wasm PROPERTIES 
     COMPILE_FLAGS "${EMSCRIPTEN_FLAGS}"
     LINK_FLAGS "${EMSCRIPTEN_FLAGS} -lembind")

@@ -37,7 +37,7 @@ function tryMonteCarloTreeSearch(rootGameTree, maxTries) {
     node.backpropagate(won);
 
     // ノードに一定回数以上到達した場合，ノードを展開する
-    if (node.visits >= 40) {
+    if (node.visits >= Math.min(40, maxTries)) {
       while (node.untriedMoves.length !== 0) {
         node.expandChild();
       }
