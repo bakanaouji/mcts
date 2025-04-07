@@ -23,8 +23,11 @@
           Black:
           <select id="black-player-type">
             <option value="human" selected>Human</option>
-            <option value="mcts-1024">MCTS_AI_1024</option>
-            <option value="mcts-4096">MCTS_AI_4096</option>
+            <option value="mcts_js-1024">MCTS_JS_1024</option>
+            <option value="mcts_js-4096">MCTS_JS_4096</option>
+            <option value="uct_wasm-1024">MCTS_WASM_1024</option>
+            <option value="uct_wasm-4096">MCTS_WASM_4096</option>
+            <option value="uct_wasm-40960">MCTS_WASM_40960</option>
             <option value="mcts_old-1024">MCTS_OLD_AI</option>
           </select>
         </label>
@@ -32,8 +35,11 @@
           White:
           <select id="white-player-type">
             <option value="human">Human</option>
-            <option value="mcts-1024">MCTS_AI_1024</option>
-            <option value="mcts-4096">MCTS_AI_4096</option>
+            <option value="mcts_js-1024">MCTS_JS_1024</option>
+            <option value="mcts_js-4096">MCTS_JS_4096</option>
+            <option value="uct_wasm-1024">MCTS_WASM_1024</option>
+            <option value="uct_wasm-4096">MCTS_WASM_4096</option>
+            <option value="uct_wasm-40960">MCTS_WASM_40960</option>
             <option value="mcts_old-1024">MCTS_OLD_AI</option>
           </select>
         </label>
@@ -45,16 +51,18 @@
 
   <script src="vendor/jquery/jquery-1.9.1.min.js"></script>
   <script src="vendor/twitter-bootstrap/js/bootstrap.min.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/board.js"></script>
+  <script src="js/othello.js"></script>
   <script src="js/gametree.js"></script>
   <script src="js/mcts.js"></script>
+  <script src="cpp/uct_wasm.js"></script>
+  <script src="js/uct_wasm.js"></script>
   <script src="js/mcts_old.js"></script>
-  <script src="js/othello.js"></script>
   <script src="js/pmc.js"></script>
   <script src="js/ui.js"></script>
-  <script src="js/utils.js"></script>
   <script src="js/ai.js"></script>
+  <script src="js/app.js"></script>
   <script src="js/main.js"></script>
 </body>
 

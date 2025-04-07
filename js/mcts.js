@@ -1,6 +1,6 @@
 // AI: Monte Carlo Tree Search {{{1
 
-function makeMonteCarloTreeSearchBasedAI(options) {
+function makeMonteCarloTreeSearchBasedAIJs(options) {
   return {
     findTheBestMove: function (gameTree) {
       return tryMonteCarloTreeSearch(gameTree, options.level);
@@ -37,7 +37,7 @@ function tryMonteCarloTreeSearch(rootGameTree, maxTries) {
     node.backpropagate(won);
 
     // ノードに一定回数以上到達した場合，ノードを展開する
-    if (node.visits >= 40) {
+    if (node.visits >= Math.min(40, maxTries)) {
       while (node.untriedMoves.length !== 0) {
         node.expandChild();
       }
@@ -125,5 +125,3 @@ Node.prototype.update = function (won) {
   this.wins += won;
   this.visits += 1;
 };
-
-

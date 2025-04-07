@@ -1,20 +1,26 @@
 # Mac files
 .DS_Store
 
+# C++ build directory
+cpp/build/
+
 # Byte-compiled / optimized / DLL files
 *.manifest
 *.spec
 
-
+# Jekyll site
 _site/**
 _site
+
+# Development tools
 _development_tool/**
 _development_tool
 
+# Sass
 .sass-cache/**
 *.css.map
 *.scssc
 
+# Dependencies
 Gemfile.lock
 *.gem
-.DS_Store

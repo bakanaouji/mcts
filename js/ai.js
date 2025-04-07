@@ -1,15 +1,16 @@
 var aiMakers = {
-  mcts: makeMonteCarloTreeSearchBasedAI,
+  mcts_js: makeMonteCarloTreeSearchBasedAIJs,
+  uct_wasm: makeUCTBasedAI,
   mcts_old: makeMonteCarloTreeSearchBasedAIOld,
   pmc: makePrimitiveMonteCarloBasedAI
 };
 
-function makeAI(playerType) {
+async function makeAI(playerType) {
   var tokens = playerType.split('-');
   var aiType = tokens[0];
   var level = parseInt(tokens[1]);
   var extras = tokens.slice(2);
-  return aiMakers[aiType]({
+  return await aiMakers[aiType]({
     level: level,
     extras: extras
   });
@@ -18,22 +19,16 @@ function makeAI(playerType) {
 /**
  * AIによって手を選択して進める
  */
-function selectMoveByAI(gameTree, ai) {
+async function selectMoveByAI(gameTree, ai) {
   $('#message').text('Now thinking...');
-  setTimeout(
-    function () {
-      var start = Date.now();
-      var newGameTree = force(ai.findTheBestMove(gameTree).gameTreePromise);
-      var end = Date.now();
-      var delta = end - start;
-      console.log(delta);
-      setTimeout(
-        function () {
-          shiftToNewGameTree(newGameTree);
-        },
-        Math.max(100 - delta, 1)
-      );
-    },
-    1
-  );
+  const start = Date.now();
+  const move = ai.findTheBestMove(gameTree);
+  const newGameTree = await force(move.gameTreePromise);
+  const end = Date.now();
+  const delta = end - start;
+  console.log(delta);
+  
+  // 最小表示時間を確保
+  await new Promise(resolve => setTimeout(resolve, Math.max(100 - delta, 1)));
+  shiftToNewGameTree(newGameTree);
 }
