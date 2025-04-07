@@ -1,9 +1,3 @@
-// Game constants
-const N = 8;  // Board size
-const BLACK = 1;
-const WHITE = -1;
-const EMPTY = 0;
-
 /**
  * グリッド座標をインデックスへ変換
  */

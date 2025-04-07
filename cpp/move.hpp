@@ -4,7 +4,7 @@
 #include <vector>
 #include <functional>
 #include <memory>
-#include "gamestate.hpp"
+#include "othellostate.hpp"
 
 class GameTree;
 

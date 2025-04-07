@@ -28,7 +28,7 @@ if ! emmake make; then
 fi
 
 echo "Copying WebAssembly files..."
-if ! cp mcts_wasm.* ..; then
+if ! cp uct_wasm.* ..; then
     echo "Failed to copy WebAssembly files"
     exit 1
 fi
